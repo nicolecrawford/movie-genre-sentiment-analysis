@@ -10,8 +10,8 @@ GENRE EXPANSION
 	- every movie is put into the set for each genre it has
 
 PARSING
-	MOVIE_TITLES_META
-		- class Movie
+	
+		- class Movie (MOVIE_TITLES_META)
 			- movieID (int)
 			- movie title (string)
 			- movie year (int)
@@ -20,10 +20,10 @@ PARSING
 	 		- genres (set)
 	 		- sorted list of Lines (list)
 	 		- set of Characters (set)
-	 	- class Line
+	 	- class Line (MOVIE_LINES)
 			- Character
 			- text (string)
-		- class Character
+		- class Character (MOVIE_CHARACTERS_META)
 			- characterID (int)
 			- character name (string)
 			- gender ("?" for unlabeled cases) (string)
