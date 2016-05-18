@@ -21,7 +21,7 @@ PARSING
 	 		- sorted list of Lines (list)
 	 		- set of Characters (set)
 	 	- class Line (MOVIE_LINES)
-			- Character
+			- character ID
 			- text (string)
 		- class Character (MOVIE_CHARACTERS_META)
 			- characterID (int)
