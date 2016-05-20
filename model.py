@@ -23,6 +23,8 @@ import pickle
 
 def main():
 
+    movie_map = parser.get_parsed_data()
+    
     movie_train = pickle.load(open("movie_train.p", "rb"))
     movie_dev = pickle.load(open("movie_dev.p", "rb"))
     movie_test = pickle.load(open("movie_test.p", "rb"))
@@ -34,15 +36,13 @@ def main():
     #     y.append(movie_map[m_id].)
 
 
-def divide_corpus():
-    
-    movie_map = parser.get_parsed_data()
+def divide_corpus(movie_map):
 
     movie_list = list(movie_map.keys())
     random.shuffle(movie_list)
 
     movie_train = movie_list[0:395]
-    movie_test= movie_list[395:519]
+    movie_test = movie_list[395:519]
     movie_dev = movie_list[519:]
 
     pickle.dump(movie_train, open("movie_train.p", "wb"))
