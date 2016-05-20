@@ -1,12 +1,13 @@
 from classes import Movie, Line, Character
 
 
-
 # might want to move this to model.py
-def main():
+def get_parsed_data():
     movie_map = parse_movie_title()
     parse_characters(movie_map)
     parse_lines(movie_map)
+    return movie_map
+
 
 def parse_movie_title():
     movie_map = {}
@@ -62,5 +63,3 @@ def parse_lines(movie_map):
             prev_m_id = m_id
 
         cur_movie_lines.append(Line(line_num, content, character_id))
-
-main()

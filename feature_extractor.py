@@ -7,7 +7,7 @@ import parser
 # 		- Average length of speech by a character
 # 		- Ratio of personal pronouns in the text (require NLTK)
 # 		- number of exclamation points
-# 		- Proportion of “We” words (who, where, why, etc.)
+#       - proportion of we words (who, where, why etc.)
 # 		- Mentions of locations (cities, countries) or organizations (FBI, KGB, etc.)
 # 		- Ratio of positive words: negative words (sentiment analysis)
 
