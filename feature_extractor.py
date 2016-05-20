@@ -7,9 +7,19 @@ import parser
 # 		- Average length of speech by a character
 # 		- Ratio of personal pronouns in the text (require NLTK)
 # 		- number of exclamation points
+#       - GloVe (?)
 #       - proportion of we words (who, where, why etc.)
-# 		- Mentions of locations (cities, countries) or organizations (FBI, KGB, etc.)
 # 		- Ratio of positive words: negative words (sentiment analysis)
+
+
+def extract_all(movie):
+    X = list()
+    X.append(num_characters_feat(movie))
+    X.append(num_male_characters_feat(movie))
+    X.append(num_female_characters_feat(movie))
+    X.append(avg_line_length_feat(movie))
+    X.append(tot_num_lines_feat(movie))
+    return X
 
 
 def num_characters_feat(movie):
@@ -35,14 +45,9 @@ def num_female_characters_feat(movie):
 def avg_line_length_feat(movie):
     total_length = 0.0
     for line in movie.lines:
-        total_length += len(line)
-
+        total_length += len(line.content)
     return total_length/len(movie.lines)
 
 
 def tot_num_lines_feat(movie):
     return len(movie.lines)
-
-
-
-
