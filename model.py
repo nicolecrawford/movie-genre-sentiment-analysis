@@ -24,16 +24,19 @@ import pickle
 def main():
 
     movie_map = parser.get_parsed_data()
-    
+
     movie_train = pickle.load(open("movie_train.p", "rb"))
-    movie_dev = pickle.load(open("movie_dev.p", "rb"))
-    movie_test = pickle.load(open("movie_test.p", "rb"))
+    # movie_dev = pickle.load(open("movie_dev.p", "rb"))
+    # movie_test = pickle.load(open("movie_test.p", "rb"))
 
 
-    # X = []
-    # for m_id in movie_train:
-    #     X.append(feature_extractor.extract_all(movie_map[m_id]))
-    #     y.append(movie_map[m_id].)
+    X = []
+    y = []
+    for m_id in movie_train:
+        movie_features = feature_extractor.extract_all(movie_train[m_id]))
+        for genre in movie_map[m_id].genres
+            X.append(movie_features)
+            y.append(genre)
 
 
 def divide_corpus(movie_map):
