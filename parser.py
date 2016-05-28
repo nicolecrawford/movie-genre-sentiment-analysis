@@ -1,5 +1,5 @@
 from classes import Movie, Line, Character
-
+import pickle
 
 # might want to move this to model.py
 def get_parsed_data():
@@ -63,3 +63,8 @@ def parse_lines(movie_map):
             prev_m_id = m_id
 
         cur_movie_lines.append(Line(line_num, content, character_id))
+
+#map of movie titles to their bechdel scores (0 = no info; -1 = not pass; 1 = pass)
+def parse_bechdel():
+    return pickle.load(open("bechdels.p", "rb"))
+
