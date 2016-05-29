@@ -37,13 +37,13 @@ genre_map = {'': 5, 'family': 0, 'adventure': 1, 'fantasy': 3, 'biography': 4, '
 
 target_names = ['comedy', 'action', 'thriller', "sci-fi", "documentary", "drama"]
 
-test_dev = False
+test_dev = True
 
-def test_on_dev(movie_dev, movie_map, bechdel_map,clf):
+def test_on_dev(movie_dev, movie_map, bechdel_map,clf,vocab):
     X = []
     y_true = []
     for m_id in movie_dev:
-        movie_features = feature_extractor.extract_all(movie_map[m_id], bechdel_map)
+        movie_features = feature_extractor.extract_all(movie_map[m_id], bechdel_map, vocab)
         for genre in movie_map[m_id].genres:
             if genre in genre_map:
                 X.append(movie_features)
@@ -77,12 +77,13 @@ def main():
     movie_dev = pickle.load(open("movie_dev.p", "rb"))
     # movie_test = pickle.load(open("movie_test.p", "rb"))
     bechdel_map = parser.parse_bechdel()
+    vocab = pickle.load(open("vocab.p", "rb"))
 
     # train and fit model
     X = []
     y_true = []
     for m_id in movie_train:
-        movie_features = feature_extractor.extract_all(movie_map[m_id], bechdel_map)
+        movie_features = feature_extractor.extract_all(movie_map[m_id], bechdel_map, vocab)
         for genre in movie_map[m_id].genres:
             if genre in genre_map:
                 X.append(movie_features)
@@ -92,10 +93,9 @@ def main():
 
 
     if test_dev:
-        test_on_dev(movie_dev, movie_map, bechdel_map, clf)
+        test_on_dev(movie_dev, movie_map, bechdel_map, clf,vocab)
     else:
         test_on_train(X, y_true, clf)
-
 
 
 def divide_corpus(movie_map):

@@ -1,5 +1,8 @@
 from classes import Movie, Line, Character
 import pickle
+import re
+from nltk.stem.porter import *
+
 
 # might want to move this to model.py
 def get_parsed_data():
@@ -7,6 +10,29 @@ def get_parsed_data():
     parse_characters(movie_map)
     parse_lines(movie_map)
     return movie_map
+
+
+# only run once
+def get_unigrams():
+    stemmer = PorterStemmer()
+    vocab_counter = {}
+    vocab = {}
+    index = 0
+    for line in open("cornell-movie-dialogs-corpus/movie_lines.txt"):
+        cats = line.split(" +++$+++ ")
+        content = re.findall(r"[\w']+|[.,!?;]", cats[4].lower())
+        for w in content:
+            word = stemmer.stem(w)
+            if word in vocab_counter:
+                vocab_counter[word] += 1
+            else:
+                vocab_counter[word] = 0
+    for w in vocab_counter:
+        if vocab_counter[w] > 10:
+            vocab[w] = index
+            index +=1
+    vocab['UNK'] = index
+    pickle.dump(vocab, open("vocab.p", "wb"))
 
 
 def parse_movie_title():
@@ -68,3 +94,4 @@ def parse_lines(movie_map):
 def parse_bechdel():
     return pickle.load(open("bechdels.p", "rb"))
 
+get_unigrams()

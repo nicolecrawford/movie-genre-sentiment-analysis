@@ -2,17 +2,17 @@
 
 import classes
 import parser
+import re
+import nltk
+from nltk.stem.porter import *
 
-# 		- bigrams, unigrams (laplace smooth)
-# 		- Average length of speech by a character
-# 		- Ratio of personal pronouns in the text (require NLTK)
+# 		- bigrams
+#       - tfidf
 # 		- number of exclamation points
-#       - GloVe (?)
-#       - proportion of we words (who, where, why etc.)
 # 		- Ratio of positive words: negative words (sentiment analysis)
 
 
-def extract_all(movie, bechdel_map):
+def extract_all(movie, bechdel_map, vocab):
     X = list()
     X.append(num_characters_feat(movie))
     X.append(ratio_male_characters_feat(movie))
@@ -22,8 +22,62 @@ def extract_all(movie, bechdel_map):
     X.append(pass_bechdel(movie, bechdel_map))
     X.append(two_female_leads(movie))
     X.append(main_character_gender(movie))
-
+    X.extend(unigrams(movie, vocab))
+    X.append(pronoun_ratio(movie))
+    X.append(exclamations(movie))
+    X.append(questions(movie))
     return X
+
+
+def questions(movie):
+    total_words = 0
+    question = 0
+    for line in movie.lines:
+        words = re.findall(r"[\w']+|[.,!?;]", line.content.lower())
+        total_words += len(words)
+        for word in words:
+            if word == '?':
+                question += 1
+    return float(question) / total_words
+
+
+def exclamations(movie):
+    total_words = 0
+    exclamation = 0
+    for line in movie.lines:
+        words = re.findall(r"[\w']+|[.,!?;]", line.content.lower())
+        total_words += len(words)
+        for word in words:
+            if word == '!':
+                exclamation += 1
+    return float(exclamation) / total_words
+
+
+def pronoun_ratio(movie):
+    total_words = 0
+    pronouns = 0
+    for line in movie.lines:
+        words = re.findall(r"[\w']+|[.,!?;]", line.content.lower())
+        total_words += len(words)
+        tags = nltk.pos_tag(words)
+        for (word,tag) in tags:
+            if tag == 'PRP':
+                pronouns += 1
+    return float(pronouns)/total_words
+
+
+def unigrams(movie, vocab):
+    stemmer = PorterStemmer()
+    unis = [0]*len(vocab)
+    for line in movie.lines:
+        words = re.findall(r"[\w']+|[.,!?;]", line.content.lower())
+        for w in words:
+            word = stemmer.stem(w)
+            if word in vocab:
+                unis[vocab[word]] += 1
+            else:
+                unis[vocab['UNK']] += 1
+    return unis
 
 
 def main_character_gender(movie):
