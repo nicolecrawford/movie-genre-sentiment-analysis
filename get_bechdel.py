@@ -32,3 +32,4 @@ for key in movie_map:
 		bechdel_map[key] = 0
 
 pickle.dump(bechdel_map, open("bechdels.p", "wb"))
+
