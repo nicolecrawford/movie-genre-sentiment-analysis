@@ -96,7 +96,7 @@ for key in movie_map:
 		else: # failure
 			movie_success[key] = -1
 
-pickle.dump(vocab, open("pickles/movie_success.p", "wb"))
+pickle.dump(movie_success, open("pickles/movie_success.p", "wb"))
 
 
 print counter, total
