@@ -32,7 +32,7 @@ def get_unigrams():
             vocab[w] = index
             index +=1
     vocab['UNK'] = index
-    pickle.dump(vocab, open("vocab.p", "wb"))
+    pickle.dump(vocab, open("pickles/vocab.p", "wb"))
 
 
 def parse_movie_title():
@@ -92,6 +92,6 @@ def parse_lines(movie_map):
 
 #map of movie titles to their bechdel scores (0 = no info; -1 = not pass; 1 = pass)
 def parse_bechdel():
-    return pickle.load(open("bechdels.p", "rb"))
+    return pickle.load(open("pickles/bechdels.p", "rb"))
 
 get_unigrams()

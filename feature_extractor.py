@@ -22,10 +22,10 @@ def extract_all(movie, bechdel_map, vocab):
     X.append(pass_bechdel(movie, bechdel_map))
     X.append(two_female_leads(movie))
     X.append(main_character_gender(movie))
-    X.extend(unigrams(movie, vocab))
-    X.append(pronoun_ratio(movie))
-    X.append(exclamations(movie))
-    X.append(questions(movie))
+    # X.extend(unigrams(movie, vocab))
+    # X.append(pronoun_ratio(movie))
+    # X.append(exclamations(movie))
+    # X.append(questions(movie))
     return X
 
 
@@ -75,8 +75,6 @@ def unigrams(movie, vocab):
             word = stemmer.stem(w)
             if word in vocab:
                 unis[vocab[word]] += 1
-            else:
-                unis[vocab['UNK']] += 1
     return unis
 
 
