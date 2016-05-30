@@ -1,11 +1,19 @@
 import re
 import urllib
 import urllib2
+import httplib # for partial read
 import pickle
 import parser
 
 
-movie_map = parser.get_parsed_data()
+# do only once
+# movie_map = parser.get_parsed_data()
+# pickle.dump(movie_map, open("pickles/movie_map.p", "wb"))
+
+# load
+movie_map = pickle.load(open("pickles/movie_map.p", "r"))
+
+
 url = 'http://www.boxofficemojo.com/search/q.php'
 movie_success = {}
 total = len(movie_map.keys())
@@ -31,15 +39,19 @@ for key in movie_map:
 	except urllib2.HTTPError as e:
 		print title, e # this only seems to fail on "the world is not enough"
 	else:
-		html = response.read()
+		try:
+			html = response.read()
+		except httplib.IncompleteRead as e:
+			html = e.partial
 		
 		# searching for highlighted entry; it's the most likely to be correct
 		m = re.search('<tr bgcolor=#FFFF99>(.+)</tr>', html, re.DOTALL)
 		
 		# searching if there's only one movie found
-		one_movie = re.search('1 Movie Matches:', html)
+		one_movie = re.search('>1 Movie Matches:', html)
 
 		box_office = 0
+		budget = 0
 
 		# if either a highlighted match or only 1 match was found
 		if m is not None or one_movie is not None:
@@ -76,13 +88,13 @@ for key in movie_map:
 		print "budget:", budget
 		if box_office is not None: counter += 1
 
-		if budget < movie_success:
-			movie_success[key] = 1
-		elif budget > movie_success:
-			movie_success[key] = -1
-		else:
-			movie_success[key] = 0
 
+		if budget == 0 or box_office == 0: # no info
+			movie_success[key] = 0
+		elif budget < box_office: # success
+			movie_success[key] = 1
+		else: # failure
+			movie_success[key] = -1
 
 pickle.dump(vocab, open("pickles/movie_success.p", "wb"))
 
