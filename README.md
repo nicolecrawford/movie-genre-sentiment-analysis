@@ -44,3 +44,9 @@ TASK 1: GENRE PREDICTION
 		- Proportion of “We” words (who, where, why, etc.)
 		- Mentions of locations (cities, countries) or organizations (FBI, KGB, etc.)
 		- Ratio of positive words: negative words (sentiment analysis)
+
+
+TESTS on Genre
+
+- for unigrams, smaller vocab doesn't work as well as the entire vocab(even though its very sparse)
+- for unigrams, the count works better than the binary feature

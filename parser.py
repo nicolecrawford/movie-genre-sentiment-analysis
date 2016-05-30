@@ -26,12 +26,12 @@ def get_unigrams():
             if word in vocab_counter:
                 vocab_counter[word] += 1
             else:
-                vocab_counter[word] = 0
+                vocab_counter[word] = 1
     for w in vocab_counter:
-        if vocab_counter[w] > 10:
+        if vocab_counter[w] > 0:
             vocab[w] = index
             index +=1
-    vocab['UNK'] = index
+    # vocab['UNK'] = index
     pickle.dump(vocab, open("pickles/vocab.p", "wb"))
 
 

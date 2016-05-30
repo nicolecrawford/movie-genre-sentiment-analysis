@@ -9,7 +9,7 @@ import feature_extractor
 import parser
 import random
 import pickle
-from collections import Counter
+import collections
 
 #
 #
@@ -35,7 +35,9 @@ genre_map = {'': 5, 'family': 0, 'adventure': 1, 'fantasy': 3, 'biography': 4, '
              'animation': 0, 'music': 0, 'comedy': 0, 'war': 1, 'sci-fi': 3, 'horror': 2, 'western': 1, 'thriller': 2,
              'mystery': 2, 'film-noir': 5, 'drama': 5, 'action': 1, 'documentary': 4, 'musical': 0, 'history':4}
 
-target_names = ['comedy', 'action', 'thriller', "sci-fi", "documentary", "drama"]
+genres = ['comedy', 'action', 'thriller', "sci-fi", "documentary", "drama"]
+
+target_names = ['0-3', '4-7', '8-10']
 
 test_dev = True
 
@@ -71,31 +73,42 @@ def test_on_train(X, y_true, clf):
 
 def main():
 
-    movie_map = parser.get_parsed_data()
-
+    # movie_map = parser.get_parsed_data()
+    movie_map = pickle.load(open("pickles/move_map.p", "rb"))
     movie_train = pickle.load(open("pickles/movie_train.p", "rb"))
     movie_dev = pickle.load(open("pickles/movie_dev.p", "rb"))
     # movie_test = pickle.load(open("pickles/movie_test.p", "rb"))
     bechdel_map = parser.parse_bechdel()
     vocab = pickle.load(open("pickles/vocab.p", "rb"))
 
-    # train and fit model
-    X = []
-    y_true = []
+    rating_distribution = collections.defaultdict(int)
     for m_id in movie_train:
-        movie_features = feature_extractor.extract_all(movie_map[m_id], bechdel_map, vocab)
-        for genre in movie_map[m_id].genres:
-            if genre in genre_map:
-                X.append(movie_features)
-                y_true.append(genre_map[genre])
-    clf = svm.SVC()
-    clf.fit(X, y_true)
+        rate = float(movie_map[m_id].rating)
+        if rate < 5:
+            rating_distribution["0:5"] += 1
+        elif rate < 8:
+            rating_distribution["5:8"] += 1
+        else:
+            rating_distribution["8:10"] += 1
+    print rating_distribution
 
-
-    if test_dev:
-        test_on_dev(movie_dev, movie_map, bechdel_map, clf,vocab)
-    else:
-        test_on_train(X, y_true, clf)
+    # train and fit model
+    # X = []
+    # y_true = []
+    # for m_id in movie_train:
+    #     movie_features = feature_extractor.extract_all(movie_map[m_id], bechdel_map, vocab)
+    #     for genre in movie_map[m_id].genres:
+    #         if genre in genre_map:
+    #             X.append(movie_features)
+    #             y_true.append(genre_map[genre])
+    # clf = svm.SVC()
+    # clf.fit(X, y_true)
+    #
+    #
+    # if test_dev:
+    #     test_on_dev(movie_dev, movie_map, bechdel_map, clf,vocab)
+    # else:
+    #     test_on_train(X, y_true, clf)
 
 
 def divide_corpus(movie_map):

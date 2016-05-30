@@ -43,7 +43,7 @@ def test_on_dev(movie_dev, movie_map, bechdel_map,clf,vocab):
     X = []
     y_true = []
     for m_id in movie_dev:
-        movie_features = feature_extractor.extract_all(movie_map[m_id], bechdel_map, vocab)
+        movie_features = feature_extractor.genre_extract_all(movie_map[m_id], bechdel_map, vocab)
         for genre in movie_map[m_id].genres:
             if genre in genre_map:
                 X.append(movie_features)
@@ -83,7 +83,7 @@ def main():
     X = []
     y_true = []
     for m_id in movie_train:
-        movie_features = feature_extractor.extract_all(movie_map[m_id], bechdel_map, vocab)
+        movie_features = feature_extractor.genre_extract_all(movie_map[m_id], bechdel_map, vocab)
         for genre in movie_map[m_id].genres:
             if genre in genre_map:
                 X.append(movie_features)
@@ -98,6 +98,7 @@ def main():
         test_on_train(X, y_true, clf)
 
 
+#done once
 def divide_corpus(movie_map):
 
     del movie_map["m616"]
