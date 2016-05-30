@@ -37,7 +37,7 @@ genre_map = {'': 5, 'family': 0, 'adventure': 1, 'fantasy': 3, 'biography': 4, '
 
 genres = ['comedy', 'action', 'thriller', "sci-fi", "documentary", "drama"]
 
-target_names = ['0-3', '4-7', '8-10']
+target_names = ['bad', 'good']
 
 test_dev = True
 
@@ -45,70 +45,62 @@ def test_on_dev(movie_dev, movie_map, bechdel_map,clf,vocab):
     X = []
     y_true = []
     for m_id in movie_dev:
-        movie_features = feature_extractor.extract_all(movie_map[m_id], bechdel_map, vocab)
-        for genre in movie_map[m_id].genres:
-            if genre in genre_map:
-                X.append(movie_features)
-                y_true.append(genre_map[genre])
+        movie_features = feature_extractor.rating_extract_all(movie_map[m_id], bechdel_map, vocab)
+        X.append(movie_features)
+        rate = float(movie_map[m_id].rating)
+        if rate <= 6.5:
+            y_true.append(target_names[0])
+        else:
+            y_true.append(target_names[1])
     y_pred = clf.predict(X)
-    y_pred[0] = 0
-    y_pred[1] = 1
-    y_pred[2] = 2
-    y_pred[3] = 3
-    y_pred[4] = 4
-    y_pred[5] = 5
+
     print(classification_report(y_true, y_pred, target_names=target_names))
 
 
 def test_on_train(X, y_true, clf):
     y_pred = clf.predict(X)
-    y_pred[0] = 0
-    y_pred[1] = 1
-    y_pred[2] = 2
-    y_pred[3] = 3
-    y_pred[4] = 4
-    y_pred[5] = 5
+
     print(classification_report(y_true, y_pred, target_names=target_names))
 
 
 def main():
 
     # movie_map = parser.get_parsed_data()
-    movie_map = pickle.load(open("pickles/move_map.p", "rb"))
+    movie_map = pickle.load(open("pickles/movie_map.p", "rb"))
     movie_train = pickle.load(open("pickles/movie_train.p", "rb"))
     movie_dev = pickle.load(open("pickles/movie_dev.p", "rb"))
     # movie_test = pickle.load(open("pickles/movie_test.p", "rb"))
     bechdel_map = parser.parse_bechdel()
     vocab = pickle.load(open("pickles/vocab.p", "rb"))
 
-    rating_distribution = collections.defaultdict(int)
-    for m_id in movie_train:
-        rate = float(movie_map[m_id].rating)
-        if rate < 5:
-            rating_distribution["0:5"] += 1
-        elif rate < 8:
-            rating_distribution["5:8"] += 1
-        else:
-            rating_distribution["8:10"] += 1
-    print rating_distribution
+    # rating_distribution = collections.defaultdict(int)
+    # for m_id in movie_train:
+    #     rate = float(movie_map[m_id].rating)
+    #     if rate <= 6.5:
+    #         rating_distribution["0:6.5"] += 1
+    #     else:
+    #         rating_distribution["6.5:10"] += 1
+    # print rating_distribution
 
     # train and fit model
-    # X = []
-    # y_true = []
-    # for m_id in movie_train:
-    #     movie_features = feature_extractor.extract_all(movie_map[m_id], bechdel_map, vocab)
-    #     for genre in movie_map[m_id].genres:
-    #         if genre in genre_map:
-    #             X.append(movie_features)
-    #             y_true.append(genre_map[genre])
-    # clf = svm.SVC()
-    # clf.fit(X, y_true)
-    #
-    #
-    # if test_dev:
-    #     test_on_dev(movie_dev, movie_map, bechdel_map, clf,vocab)
-    # else:
-    #     test_on_train(X, y_true, clf)
+    X = []
+    y_true = []
+    for m_id in movie_train:
+        movie_features = feature_extractor.rating_extract_all(movie_map[m_id], bechdel_map, vocab)
+        X.append(movie_features)
+        rate = float(movie_map[m_id].rating)
+        if rate <= 6.5:
+            y_true.append(target_names[0])
+        else:
+            y_true.append(target_names[1])
+    clf = svm.SVC()
+    clf.fit(X, y_true)
+
+
+    if test_dev:
+        test_on_dev(movie_dev, movie_map, bechdel_map, clf, vocab)
+    else:
+        test_on_train(X, y_true, clf)
 
 
 def divide_corpus(movie_map):

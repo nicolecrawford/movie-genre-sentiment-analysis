@@ -31,18 +31,18 @@ def genre_extract_all(movie, bechdel_map, vocab):
 
 def rating_extract_all(movie, bechdel_map, vocab):
     X = list()
-    X.append(num_characters_feat(movie))
-    X.append(ratio_male_characters_feat(movie))
-    X.append(ratio_female_characters_feat(movie))
-    X.append(avg_line_length_feat(movie))
-    X.append(tot_num_lines_feat(movie))
-    X.append(pass_bechdel(movie, bechdel_map))
-    X.append(two_female_leads(movie))
-    X.append(main_character_gender(movie))
+    # X.append(num_characters_feat(movie))
+    # X.append(ratio_male_characters_feat(movie))
+    # X.append(ratio_female_characters_feat(movie))
+    # X.append(avg_line_length_feat(movie))
+    # X.append(tot_num_lines_feat(movie))
+    # X.append(pass_bechdel(movie, bechdel_map))
+    # X.append(two_female_leads(movie))
+    # X.append(main_character_gender(movie))
     X.extend(unigrams(movie, vocab))
-    X.append(pronoun_ratio(movie))
-    X.append(exclamations(movie))
-    X.append(questions(movie))
+    # X.append(pronoun_ratio(movie))
+    # X.append(exclamations(movie))
+    # X.append(questions(movie))
     return X
 
 

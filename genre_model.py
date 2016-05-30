@@ -93,7 +93,7 @@ def main():
 
 
     if test_dev:
-        test_on_dev(movie_dev, movie_map, bechdel_map, clf,vocab)
+        test_on_dev(movie_dev, movie_map, bechdel_map, clf, vocab)
     else:
         test_on_train(X, y_true, clf)
 
