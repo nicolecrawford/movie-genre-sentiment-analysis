@@ -37,6 +37,7 @@ genre_map = {'': 5, 'family': 0, 'adventure': 1, 'fantasy': 3, 'biography': 4, '
 
 genres = ['comedy', 'action', 'thriller', "sci-fi", "documentary", "drama"]
 
+# bad=0;good=1
 target_names = ['bad', 'good']
 
 test_dev = True
@@ -90,9 +91,10 @@ def main():
         X.append(movie_features)
         rate = float(movie_map[m_id].rating)
         if rate <= 6.5:
-            y_true.append(target_names[0])
+            y_true.append(0)
         else:
-            y_true.append(target_names[1])
+            y_true.append(1)
+    print y_true, len(y_true), len(X)
     clf = svm.SVC()
     clf.fit(X, y_true)
 

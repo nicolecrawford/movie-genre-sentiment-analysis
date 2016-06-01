@@ -9,8 +9,7 @@ import feature_extractor
 import parser
 import random
 import pickle
-from collections import Counter
-
+import collections
 #
 #
 # clf = svm.SVC()
@@ -71,7 +70,7 @@ def test_on_train(X, y_true, clf):
 
 def main():
 
-    movie_map = parser.get_parsed_data()
+    movie_map = pickle.load(open("pickles/movie_map.p", "rb"))
 
     movie_train = pickle.load(open("pickles/movie_train.p", "rb"))
     movie_dev = pickle.load(open("pickles/movie_dev.p", "rb"))
@@ -82,20 +81,25 @@ def main():
     # train and fit model
     X = []
     y_true = []
+    spread_genre = collections.defaultdict(int)
     for m_id in movie_train:
-        movie_features = feature_extractor.genre_extract_all(movie_map[m_id], bechdel_map, vocab)
+        # movie_features = feature_extractor.genre_extract_all(movie_map[m_id], bechdel_map, vocab)
         for genre in movie_map[m_id].genres:
             if genre in genre_map:
-                X.append(movie_features)
+                spread_genre[genre_map[genre]] += 1
+                # X.append(movie_features)
                 y_true.append(genre_map[genre])
-    clf = svm.SVC()
-    clf.fit(X, y_true)
 
+    print y_true, len(y_true)
 
-    if test_dev:
-        test_on_dev(movie_dev, movie_map, bechdel_map, clf, vocab)
-    else:
-        test_on_train(X, y_true, clf)
+    # clf = svm.SVC()
+    # clf.fit(X, y_true)
+    #
+    #
+    # if test_dev:
+    #     test_on_dev(movie_dev, movie_map, bechdel_map, clf, vocab)
+    # else:
+    #     test_on_train(X, y_true, clf)
 
 
 #done once

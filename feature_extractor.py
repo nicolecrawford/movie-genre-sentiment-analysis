@@ -11,6 +11,13 @@ from nltk.stem.porter import *
 # 		- number of exclamation points
 # 		- Ratio of positive words: negative words (sentiment analysis)
 
+genre_map = {'': 5, 'family': 0, 'adventure': 1, 'fantasy': 3, 'biography': 4, 'crime': 2, 'romance': 5,
+             'animation': 0, 'music': 0, 'comedy': 0, 'war': 1, 'sci-fi': 3, 'horror': 2, 'western': 1, 'thriller': 2,
+             'mystery': 2, 'film-noir': 5, 'drama': 5, 'action': 1, 'documentary': 4, 'musical': 0, 'history': 4}
+
+target_names = ['comedy', 'action', 'thriller', "sci-fi", "documentary", "drama"]
+
+
 
 def genre_extract_all(movie, bechdel_map, vocab):
     X = list()
@@ -39,10 +46,11 @@ def rating_extract_all(movie, bechdel_map, vocab):
     # X.append(pass_bechdel(movie, bechdel_map))
     # X.append(two_female_leads(movie))
     # X.append(main_character_gender(movie))
-    X.extend(unigrams(movie, vocab))
+    # X.extend(unigrams(movie, vocab))
     # X.append(pronoun_ratio(movie))
     # X.append(exclamations(movie))
     # X.append(questions(movie))
+    X = genre_features(movie)
     return X
 
 
@@ -62,6 +70,12 @@ def box_office_extract_all(movie, bechdel_map, vocab):
     X.append(questions(movie))
     return X
 
+def genre_features(movie):
+    to_return = [0]*len(target_names)
+    for genre in movie.genres:
+        if genre in genre_map:
+            to_return.insert(genre_map[genre],1)
+    return to_return
 
 def questions(movie):
     total_words = 0
