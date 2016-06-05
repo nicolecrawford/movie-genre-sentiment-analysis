@@ -31,11 +31,11 @@ import collections
 # documentary, biography, history (4)
 # drama, film-noir, romance, " " (5)
 
-genre_map = {'': 5, 'family': 0, 'adventure': 1, 'fantasy': 3, 'biography': 4, 'crime': 2, 'romance': 5,
+genre_map = {'': 4, 'family': 0, 'adventure': 1, 'fantasy': 3, 'biography': 4, 'crime': 2, 'romance': 4,
              'animation': 0, 'music': 0, 'comedy': 0, 'war': 1, 'sci-fi': 3, 'horror': 2, 'western': 1, 'thriller': 2,
-             'mystery': 2, 'film-noir': 5, 'drama': 5, 'action': 1, 'documentary': 4, 'musical': 0, 'history':4}
+             'mystery': 2, 'film-noir': 4, 'drama': 4, 'action': 1, 'documentary': 4, 'musical': 0, 'history':4}
 
-genres = ['comedy', 'action', 'thriller', "sci-fi", "documentary", "drama"]
+genres = ['comedy', 'action', 'thriller', "sci-fi", "drama"]
 
 # bad=0;good=1
 target_names = ['bad', 'good']
@@ -50,9 +50,9 @@ def test_on_dev(movie_dev, movie_map, bechdel_map,clf,vocab):
         X.append(movie_features)
         rate = float(movie_map[m_id].rating)
         if rate <= 6.5:
-            y_true.append(target_names[0])
+            y_true.append(0)
         else:
-            y_true.append(target_names[1])
+            y_true.append(1)
     y_pred = clf.predict(X)
 
     print(classification_report(y_true, y_pred, target_names=target_names))
@@ -94,7 +94,6 @@ def main():
             y_true.append(0)
         else:
             y_true.append(1)
-    print y_true, len(y_true), len(X)
     clf = svm.SVC()
     clf.fit(X, y_true)
 

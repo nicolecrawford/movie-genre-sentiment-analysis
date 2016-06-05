@@ -81,25 +81,24 @@ def main():
     # train and fit model
     X = []
     y_true = []
-    spread_genre = collections.defaultdict(int)
+    # spread_genre = collections.defaultdict(int)
     for m_id in movie_train:
-        # movie_features = feature_extractor.genre_extract_all(movie_map[m_id], bechdel_map, vocab)
+        movie_features = feature_extractor.genre_extract_all(movie_map[m_id], bechdel_map, vocab)
         for genre in movie_map[m_id].genres:
             if genre in genre_map:
-                spread_genre[genre_map[genre]] += 1
-                # X.append(movie_features)
+                # spread_genre[genre_map[genre]] += 1
+                X.append(movie_features)
                 y_true.append(genre_map[genre])
 
-    print y_true, len(y_true)
+    # print spread_genre
+    clf = svm.SVC()
+    clf.fit(X, y_true)
 
-    # clf = svm.SVC()
-    # clf.fit(X, y_true)
-    #
-    #
-    # if test_dev:
-    #     test_on_dev(movie_dev, movie_map, bechdel_map, clf, vocab)
-    # else:
-    #     test_on_train(X, y_true, clf)
+
+    if test_dev:
+        test_on_dev(movie_dev, movie_map, bechdel_map, clf, vocab)
+    else:
+        test_on_train(X, y_true, clf)
 
 
 #done once

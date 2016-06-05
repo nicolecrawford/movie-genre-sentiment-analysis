@@ -5,6 +5,7 @@ import parser
 import re
 import nltk
 from nltk.stem.porter import *
+from nltk.corpus import opinion_lexicon
 
 # 		- bigrams
 #       - tfidf
@@ -33,6 +34,7 @@ def genre_extract_all(movie, bechdel_map, vocab):
     X.append(pronoun_ratio(movie))
     X.append(exclamations(movie))
     X.append(questions(movie))
+    X.append(sentiment(movie))
     return X
 
 
@@ -46,11 +48,12 @@ def rating_extract_all(movie, bechdel_map, vocab):
     # X.append(pass_bechdel(movie, bechdel_map))
     # X.append(two_female_leads(movie))
     # X.append(main_character_gender(movie))
-    # X.extend(unigrams(movie, vocab))
+    X.extend(unigrams(movie, vocab))
+    X.append(sentiment(movie))
     # X.append(pronoun_ratio(movie))
     # X.append(exclamations(movie))
     # X.append(questions(movie))
-    X = genre_features(movie)
+    # X.extend(genre_features(movie))
     return X
 
 
@@ -68,14 +71,36 @@ def box_office_extract_all(movie, bechdel_map, vocab):
     X.append(pronoun_ratio(movie))
     X.append(exclamations(movie))
     X.append(questions(movie))
+    X.append(sentiment(movie))
     return X
+
+
+# positive = 1; negative = 0
+def sentiment(movie):
+    stemmer = PorterStemmer()
+    pos_count = 0
+    neg_count = 0
+    for line in movie.lines:
+        words = re.findall(r"[\w']+|[.,!?;]", line.content.lower())
+        for w in words:
+            word = stemmer.stem(w)
+            if word in set(opinion_lexicon.negative()):
+                neg_count += 1
+            elif word in set(opinion_lexicon.negative()):
+                pos_count += 1
+    if pos_count > neg_count:
+        return 1
+    else:
+        return 0
+
 
 def genre_features(movie):
     to_return = [0]*len(target_names)
     for genre in movie.genres:
         if genre in genre_map:
-            to_return.insert(genre_map[genre],1)
+            to_return[genre_map[genre]] =  1
     return to_return
+
 
 def questions(movie):
     total_words = 0
@@ -123,7 +148,8 @@ def unigrams(movie, vocab):
             word = stemmer.stem(w)
             if word in vocab:
                 unis[vocab[word]] += 1
-    return unis
+    norm = [float(i) / sum(unis) for i in unis] #normalize to sum to 1.0
+    return norm
 
 
 def main_character_gender(movie):
