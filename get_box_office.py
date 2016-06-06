@@ -12,7 +12,7 @@ import parser
 
 # load
 movie_map = pickle.load(open("pickles/movie_map.p", "r"))
-
+print "finished loading movie_map"
 
 url = 'http://www.boxofficemojo.com/search/q.php'
 movie_success = {}
@@ -20,17 +20,12 @@ total = len(movie_map.keys())
 counter = 0
 for key in movie_map:
 
-
-
 	box_office = 0
 	budget = 0
 	movie_page = ""
 	title = movie_map[key].title
 	query_args = {'q': title}
 	data = urllib.urlencode(query_args)
-
-	print "------------------"
-	print title
 
 	request = urllib2.Request(url, data)
 
@@ -48,15 +43,19 @@ for key in movie_map:
 		m = re.search('<tr bgcolor=#FFFF99>(.+)</tr>', html, re.DOTALL)
 		
 		# searching if there's only one movie found
-		one_movie = re.search('>1 Movie Matches:', html)
+		one_movie = re.search('>1 Movie Matches:(.*?)</table>', html, re.DOTALL)
+
+		if m is None and one_movie is not None:
+			m = one_movie.group(0)
+		elif m is not None:
+			m = m.group(0)
 
 		box_office = 0
 		budget = 0
+		movie_page = ""
 
 		# if either a highlighted match or only 1 match was found
-		if m is not None or one_movie is not None:
-			
-			m = m.group(0) if m is not None else html
+		if m is not None:
 
 			box_office = re.search('>\$([\d,]+)<', m)
 			if box_office is not None:
@@ -76,13 +75,19 @@ for key in movie_map:
 					html = response.read()
 				except httplib.IncompleteRead as e:
 					html = e.partial
+
+				# 16 million
 				budget = re.search('Production Budget: <b>\$(\d+) million</b>', html)
+				if budget is None: # 16.5 million
+					budget = re.search('Production Budget: <b>\$(\d+)\.\d\d? million</b>', html)
+
 				if budget is not None:
 					budget = budget.group(1)			
 					budget = int(budget.replace(",", "") + ("0" * 6))
 				else:
 					budget = 0
-
+		
+		print title
 		print "box_office", box_office
 		print movie_page
 		print "budget:", budget
@@ -91,10 +96,13 @@ for key in movie_map:
 
 		if budget == 0 or box_office == 0: # no info
 			movie_success[key] = 0
-		elif budget < box_office: # success
+			print "box office n/a"
+		elif (budget * 2) < box_office: # success
 			movie_success[key] = 1
+			print "box office success"
 		else: # failure
 			movie_success[key] = -1
+			print "box office flop"
 
 pickle.dump(movie_success, open("pickles/movie_success.p", "wb"))
 
