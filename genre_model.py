@@ -30,19 +30,20 @@ import collections
 # documentary, biography, history (4)
 # drama, film-noir, romance, " " (5)
 
+
 genre_map = {'': 5, 'family': 0, 'adventure': 1, 'fantasy': 3, 'biography': 4, 'crime': 2, 'romance': 5,
              'animation': 0, 'music': 0, 'comedy': 0, 'war': 1, 'sci-fi': 3, 'horror': 2, 'western': 1, 'thriller': 2,
-             'mystery': 2, 'film-noir': 5, 'drama': 5, 'action': 1, 'documentary': 4, 'musical': 0, 'history':4}
+             'mystery': 2, 'film-noir': 5, 'drama': 5, 'action': 1, 'documentary': 4, 'musical': 0, 'history': 4}
 
 target_names = ['comedy', 'action', 'thriller', "sci-fi", "documentary", "drama"]
 
 test_dev = True
 
-def test_on_dev(movie_dev, movie_map, bechdel_map,clf,vocab):
+def test_on_dev(movie_dev, movie_map, bechdel_map,clf,vocab, bigrams):
     X = []
     y_true = []
     for m_id in movie_dev:
-        movie_features = feature_extractor.genre_extract_all(movie_map[m_id], bechdel_map, vocab)
+        movie_features = feature_extractor.genre_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
         for genre in movie_map[m_id].genres:
             if genre in genre_map:
                 X.append(movie_features)
@@ -77,18 +78,23 @@ def main():
     # movie_test = pickle.load(open("pickles/movie_test.p", "rb"))
     bechdel_map = parser.parse_bechdel()
     vocab = pickle.load(open("pickles/vocab.p", "rb"))
+    bigrams = pickle.load(open("pickles/bigrams.p", "rb"))
 
     # train and fit model
     X = []
     y_true = []
     # spread_genre = collections.defaultdict(int)
     for m_id in movie_train:
-        movie_features = feature_extractor.genre_extract_all(movie_map[m_id], bechdel_map, vocab)
+        # movie_features = feature_extractor.genre_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
+        best_genre_map = collections.defaultdict(int)
         for genre in movie_map[m_id].genres:
             if genre in genre_map:
+                best_genre_map[genre_map[genre]] += 1
                 # spread_genre[genre_map[genre]] += 1
-                X.append(movie_features)
-                y_true.append(genre_map[genre])
+        # X.append(movie_features)
+        best_genre, count = max(best_genre_map.iteritems(), key=lambda x: x[1])
+        y_true.append(best_genre)
+        print best_genre
 
     # print spread_genre
     clf = svm.SVC()
@@ -96,7 +102,7 @@ def main():
 
 
     if test_dev:
-        test_on_dev(movie_dev, movie_map, bechdel_map, clf, vocab)
+        test_on_dev(movie_dev, movie_map, bechdel_map, clf, vocab, bigrams)
     else:
         test_on_train(X, y_true, clf)
 

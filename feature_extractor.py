@@ -6,6 +6,7 @@ import re
 import nltk
 from nltk.stem.porter import *
 from nltk.corpus import opinion_lexicon
+import collections
 
 # 		- bigrams
 #       - tfidf
@@ -30,30 +31,33 @@ def genre_extract_all(movie, bechdel_map, vocab):
     X.append(pass_bechdel(movie, bechdel_map))
     X.append(two_female_leads(movie))
     X.append(main_character_gender(movie))
+    X.append(movie_vocab_size(movie))
     X.extend(unigrams(movie, vocab))
     X.append(pronoun_ratio(movie))
     X.append(exclamations(movie))
     X.append(questions(movie))
-    X.append(sentiment(movie))
+    # X.append(sentiment(movie))
     return X
 
 
-def rating_extract_all(movie, bechdel_map, vocab):
+def rating_extract_all(movie, bechdel_map, vocab, bigrams):
     X = list()
-    # X.append(num_characters_feat(movie))
-    # X.append(ratio_male_characters_feat(movie))
-    # X.append(ratio_female_characters_feat(movie))
-    # X.append(avg_line_length_feat(movie))
-    # X.append(tot_num_lines_feat(movie))
-    # X.append(pass_bechdel(movie, bechdel_map))
-    # X.append(two_female_leads(movie))
-    # X.append(main_character_gender(movie))
-    X.extend(unigrams(movie, vocab))
-    X.append(sentiment(movie))
-    # X.append(pronoun_ratio(movie))
-    # X.append(exclamations(movie))
-    # X.append(questions(movie))
-    # X.extend(genre_features(movie))
+    # X.append(0) #baseline
+    X.append(num_characters_feat(movie))
+    X.append(ratio_male_characters_feat(movie))
+    X.append(ratio_female_characters_feat(movie))
+    X.append(avg_line_length_feat(movie))
+    X.append(tot_num_lines_feat(movie))
+    X.append(pass_bechdel(movie, bechdel_map))
+    X.append(two_female_leads(movie))
+    X.append(main_character_gender(movie))
+    X.append(movie_vocab_size(movie))
+    # X.extend(unigrams(movie, vocab))
+    # X.append(sentiment(movie))
+    X.append(pronoun_ratio(movie))
+    X.append(exclamations(movie))
+    X.append(questions(movie))
+    X.extend(genre_features(movie))
     return X
 
 
@@ -67,11 +71,12 @@ def box_office_extract_all(movie, bechdel_map, vocab):
     X.append(pass_bechdel(movie, bechdel_map))
     X.append(two_female_leads(movie))
     X.append(main_character_gender(movie))
+    X.append(movie_vocab_size(movie))
     X.extend(unigrams(movie, vocab))
     X.append(pronoun_ratio(movie))
     X.append(exclamations(movie))
     X.append(questions(movie))
-    X.append(sentiment(movie))
+    # X.append(sentiment(movie))
     return X
 
 
@@ -96,9 +101,12 @@ def sentiment(movie):
 
 def genre_features(movie):
     to_return = [0]*len(target_names)
+    best_genre_map = collections.defaultdict(int)
     for genre in movie.genres:
         if genre in genre_map:
-            to_return[genre_map[genre]] =  1
+            best_genre_map[genre_map[genre]] += 1
+    best_genre, count = max(best_genre_map.iteritems(), key=lambda x: x[1])
+    to_return[best_genre] = 1
     return to_return
 
 
@@ -149,6 +157,21 @@ def unigrams(movie, vocab):
             if word in vocab:
                 unis[vocab[word]] += 1
     norm = [float(i) / sum(unis) for i in unis] #normalize to sum to 1.0
+    return norm
+
+def bigrams(movie, bigrams):
+    stemmer = PorterStemmer()
+    bis = [0]*len(bigrams)
+    for line in movie.lines:
+        words = re.findall(r"[\w']+|[.,!?;]", line.content.lower())
+        for j in range (1,len(words)):
+            w1 = words[j-1]
+            w2 = words[j]
+            word1 = stemmer.stem(w1)
+            word2 = stemmer.stem(w2)
+            if (word1,word2) in bigrams:
+                bis[bigrams[word1,word2]] += 1
+    norm = [float(i) / sum(bis) for i in bis] #normalize to sum to 1.0
     return norm
 
 
@@ -221,3 +244,13 @@ def avg_line_length_feat(movie):
 
 def tot_num_lines_feat(movie):
     return len(movie.lines)
+
+def movie_vocab_size(movie):
+    stemmer = PorterStemmer()
+    vocab = set()
+    for line in movie.lines:
+        words = re.findall(r"[\w']+|[.,!?;]", line.content.lower())
+        for w in words:
+            word = stemmer.stem(w)
+            vocab.add(word)
+    return len(vocab)

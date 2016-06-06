@@ -2,6 +2,7 @@
 
 
 from sklearn import svm
+from sklearn.linear_model import LogisticRegression as lr
 from sklearn.metrics import classification_report
 
 import classes
@@ -11,61 +12,33 @@ import random
 import pickle
 from collections import Counter
 
-#
-#
-# clf = svm.SVC()
-# clf.fit(X, y)
-#
-#
-# X = [[0, 0], [1, 1]]
-# y = [0, 1]
-#
-# clf.predict([[2., 2.]])
-#
+test_dev = False
+runSVM = False
 
-# genres
-# comedy, family, music, animation, musical (0)
-# action. adventure, war, western (1)
-# thriller, horror, mystery, crime (2)
-# sci-fi, fantasy (3)
-# documentary, biography, history (4)
-# drama, film-noir, romance, " " (5)
+# 0 = fail ; 1 = success
+target_names = ["fail", "success"]
 
-genre_map = {'': 5, 'family': 0, 'adventure': 1, 'fantasy': 3, 'biography': 4, 'crime': 2, 'romance': 5,
-             'animation': 0, 'music': 0, 'comedy': 0, 'war': 1, 'sci-fi': 3, 'horror': 2, 'western': 1, 'thriller': 2,
-             'mystery': 2, 'film-noir': 5, 'drama': 5, 'action': 1, 'documentary': 4, 'musical': 0, 'history':4}
-
-target_names = ['comedy', 'action', 'thriller', "sci-fi", "documentary", "drama"]
-
-test_dev = True
-
-def test_on_dev(movie_dev, movie_map, bechdel_map,clf,vocab):
+def test_on_dev(movie_dev, movie_map, bechdel_map,model,vocab,box_office, bigrams):
     X = []
     y_true = []
+    count = 1
     for m_id in movie_dev:
-        movie_features = feature_extractor.extract_all(movie_map[m_id], bechdel_map, vocab)
-        for genre in movie_map[m_id].genres:
-            if genre in genre_map:
-                X.append(movie_features)
-                y_true.append(genre_map[genre])
-    y_pred = clf.predict(X)
-    y_pred[0] = 0
-    y_pred[1] = 1
-    y_pred[2] = 2
-    y_pred[3] = 3
-    y_pred[4] = 4
-    y_pred[5] = 5
+        if box_office[m_id] != 0:
+            print "dev movie", movie_map[m_id].title
+            count += 1
+            movie_features = feature_extractor.box_office_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
+            X.append(movie_features)
+            if box_office[m_id] == 1:
+                y_true.append(target_names[1])
+            else:
+                y_true.append(target_names[0])
+    print "dev count", count
+    y_pred = model.predict(X)
     print(classification_report(y_true, y_pred, target_names=target_names))
 
 
-def test_on_train(X, y_true, clf):
-    y_pred = clf.predict(X)
-    y_pred[0] = 0
-    y_pred[1] = 1
-    y_pred[2] = 2
-    y_pred[3] = 3
-    y_pred[4] = 4
-    y_pred[5] = 5
+def test_on_train(X, y_true, logistic):
+    y_pred = logistic.predict(X)
     print(classification_report(y_true, y_pred, target_names=target_names))
 
 
@@ -75,27 +48,41 @@ def main():
 
     movie_train = pickle.load(open("pickles/movie_train.p", "rb"))
     movie_dev = pickle.load(open("pickles/movie_dev.p", "rb"))
+    box_office = pickle.load(open("pickles/movie_success.p", "rb"))
     # movie_test = pickle.load(open("pickles/movie_test.p", "rb"))
-    bechdel_map = parser.parse_bechdel()
+    bechdel_map = pickle.load(open("pickles/bechdels.p", "rb"))
     vocab = pickle.load(open("pickles/vocab.p", "rb"))
+    bigrams = pickle.load(open("pickles/bigrams.p", "rb"))
 
+    count = 0
     # train and fit model
     X = []
     y_true = []
     for m_id in movie_train:
-        movie_features = feature_extractor.extract_all(movie_map[m_id], bechdel_map, vocab)
-        for genre in movie_map[m_id].genres:
-            if genre in genre_map:
-                X.append(movie_features)
-                y_true.append(genre_map[genre])
-    clf = svm.SVC()
-    clf.fit(X, y_true)
+        if box_office[m_id] != 0:
+            print "train movie", movie_map[m_id].title
+            count +=1
+            movie_features = feature_extractor.box_office_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
+            X.append(movie_features)
+            if box_office[m_id] == 1:
+                y_true.append(target_names[1])
+            else:
+                y_true.append(target_names[0])
 
+    model = lr()
+    if runSVM:
+        model = svm.SVC()
+        model.fit(X, y_true)
+    else:
+        model = lr()
+        model.fit(X, y_true)
+
+    pickle.dump(model, open("pickles/model.p", "wb"))
 
     if test_dev:
-        test_on_dev(movie_dev, movie_map, bechdel_map, clf,vocab)
+        test_on_dev(movie_dev, movie_map, bechdel_map, model,vocab, box_office, bigrams)
     else:
-        test_on_train(X, y_true, clf)
+        test_on_train(X, y_true, model)
 
 
 def divide_corpus(movie_map):

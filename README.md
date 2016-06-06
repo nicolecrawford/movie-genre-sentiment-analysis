@@ -50,3 +50,11 @@ TESTS on Genre
 
 - for unigrams, smaller vocab doesn't work as well as the entire vocab(even though its very sparse)
 - for unigrams, the count works better than the binary feature
+
+
+
+
+box_office spread:
+fail 111
+succes 136
+zero 368

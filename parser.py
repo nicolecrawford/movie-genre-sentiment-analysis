@@ -35,6 +35,31 @@ def get_unigrams():
     pickle.dump(vocab, open("pickles/vocab.p", "wb"))
 
 
+def get_bigrams():
+    stemmer = PorterStemmer()
+    vocab_counter = {}
+    vocab = {}
+    index = 0
+    for line in open("cornell-movie-dialogs-corpus/movie_lines.txt"):
+        cats = line.split(" +++$+++ ")
+        content = re.findall(r"[\w']+|[.,!?;]", cats[4].lower())
+        for i in range (1, len(content)):
+            w2 = content[i]
+            w1 = content[i-1]
+            word1 = stemmer.stem(w1)
+            word2 = stemmer.stem(w2)
+            if (word1,word2) in vocab_counter:
+                vocab_counter[(word1,word2)] += 1
+            else:
+                vocab_counter[(word1, word2)] = 1
+    for pair in vocab_counter:
+        if vocab_counter[pair] > 0:
+            vocab[pair] = index
+            index +=1
+    # vocab['UNK'] = index
+    pickle.dump(vocab, open("pickles/bigrams.p", "wb"))
+
+
 def parse_movie_title():
     movie_map = {}
     for line in open("cornell-movie-dialogs-corpus/movie_titles_metadata.txt"):
@@ -94,4 +119,5 @@ def parse_lines(movie_map):
 def parse_bechdel():
     return pickle.load(open("pickles/bechdels.p", "rb"))
 
-get_unigrams()
+# get_unigrams()
+get_bigrams()
