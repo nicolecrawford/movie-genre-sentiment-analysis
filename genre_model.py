@@ -37,35 +37,35 @@ genre_map = {'': 5, 'family': 0, 'adventure': 1, 'fantasy': 3, 'biography': 4, '
 
 target_names = ['comedy', 'action', 'thriller', "sci-fi", "documentary", "drama"]
 
-test_dev = True
+test_dev = False
 
 def test_on_dev(movie_dev, movie_map, bechdel_map,clf,vocab, bigrams):
     X = []
     y_true = []
     for m_id in movie_dev:
-        movie_features = feature_extractor.genre_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
-        for genre in movie_map[m_id].genres:
-            if genre in genre_map:
-                X.append(movie_features)
-                y_true.append(genre_map[genre])
+        if (len(movie_map[m_id].genres) > 0):
+            best_genre_map = collections.defaultdict(int)
+            movie_features = feature_extractor.genre_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
+            for genre in movie_map[m_id].genres:
+                if genre in genre_map:
+                    best_genre_map[genre_map[genre]] += 1
+                    # spread_genre[genre_map[genre]] += 1
+            X.append(movie_features)
+            best_genre, count = max(best_genre_map.iteritems(), key=lambda x: x[1])
+            y_true.append(best_genre)
     y_pred = clf.predict(X)
-    y_pred[0] = 0
-    y_pred[1] = 1
-    y_pred[2] = 2
-    y_pred[3] = 3
-    y_pred[4] = 4
-    y_pred[5] = 5
+
     print(classification_report(y_true, y_pred, target_names=target_names))
 
 
-def test_on_train(X, y_true, clf):
+def test_on_train(X, y_true, clf,movie_map,movie_train):
     y_pred = clf.predict(X)
-    y_pred[0] = 0
-    y_pred[1] = 1
-    y_pred[2] = 2
-    y_pred[3] = 3
-    y_pred[4] = 4
-    y_pred[5] = 5
+    print 'here'
+    for i in range(len(y_pred)):
+        if y_pred[i] != y_true[i]:
+            print movie_map[movie_train[i]].title
+            print 'actual',y_true[i]
+            print 'predicted',y_pred[i]
     print(classification_report(y_true, y_pred, target_names=target_names))
 
 
@@ -85,18 +85,20 @@ def main():
     y_true = []
     # spread_genre = collections.defaultdict(int)
     for m_id in movie_train:
-        # movie_features = feature_extractor.genre_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
-        best_genre_map = collections.defaultdict(int)
-        for genre in movie_map[m_id].genres:
-            if genre in genre_map:
-                best_genre_map[genre_map[genre]] += 1
-                # spread_genre[genre_map[genre]] += 1
-        # X.append(movie_features)
-        best_genre, count = max(best_genre_map.iteritems(), key=lambda x: x[1])
-        y_true.append(best_genre)
-        print best_genre
+        if len(movie_map[m_id].genres) > 0:
+            best_genre_map = collections.defaultdict(int)
+            for genre in movie_map[m_id].genres:
+                if genre in genre_map:
+                    best_genre_map[genre_map[genre]] += 1
+                    # spread_genre[genre_map[genre]] += 1
+            if best_genre_map:
+                best_genre, count = max(best_genre_map.iteritems(), key=lambda x: x[1])
+                movie_features = feature_extractor.genre_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
+                X.append(movie_features)
+                y_true.append(best_genre)
 
-    # print spread_genre
+
+
     clf = svm.SVC()
     clf.fit(X, y_true)
 
@@ -104,7 +106,7 @@ def main():
     if test_dev:
         test_on_dev(movie_dev, movie_map, bechdel_map, clf, vocab, bigrams)
     else:
-        test_on_train(X, y_true, clf)
+        test_on_train(X, y_true, clf,movie_map,movie_train)
 
 
 #done once

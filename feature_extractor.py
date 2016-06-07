@@ -21,7 +21,7 @@ target_names = ['comedy', 'action', 'thriller', "sci-fi", "documentary", "drama"
 
 
 
-def genre_extract_all(movie, bechdel_map, vocab):
+def genre_extract_all(movie, bechdel_map, vocab, bigrams):
     X = list()
     X.append(num_characters_feat(movie))
     X.append(ratio_male_characters_feat(movie))
@@ -32,7 +32,7 @@ def genre_extract_all(movie, bechdel_map, vocab):
     X.append(two_female_leads(movie))
     X.append(main_character_gender(movie))
     X.append(movie_vocab_size(movie))
-    X.extend(unigrams(movie, vocab))
+    # X.extend(unigrams(movie, vocab))
     X.append(pronoun_ratio(movie))
     X.append(exclamations(movie))
     X.append(questions(movie))
@@ -53,6 +53,7 @@ def rating_extract_all(movie, bechdel_map, vocab, bigrams):
     X.append(main_character_gender(movie))
     X.append(movie_vocab_size(movie))
     # X.extend(unigrams(movie, vocab))
+    # X.extend(get_bigrams(movie,bigrams))
     # X.append(sentiment(movie))
     X.append(pronoun_ratio(movie))
     X.append(exclamations(movie))
@@ -61,8 +62,9 @@ def rating_extract_all(movie, bechdel_map, vocab, bigrams):
     return X
 
 
-def box_office_extract_all(movie, bechdel_map, vocab):
+def box_office_extract_all(movie, bechdel_map, vocab,bigrams):
     X = list()
+    # X.append(0) #baseline
     X.append(num_characters_feat(movie))
     X.append(ratio_male_characters_feat(movie))
     X.append(ratio_female_characters_feat(movie))
@@ -72,11 +74,12 @@ def box_office_extract_all(movie, bechdel_map, vocab):
     X.append(two_female_leads(movie))
     X.append(main_character_gender(movie))
     X.append(movie_vocab_size(movie))
-    X.extend(unigrams(movie, vocab))
+    # X.extend(unigrams(movie, vocab))
+    # X.append(sentiment(movie))
     X.append(pronoun_ratio(movie))
     X.append(exclamations(movie))
     X.append(questions(movie))
-    # X.append(sentiment(movie))
+    X.extend(genre_features(movie))
     return X
 
 
@@ -159,7 +162,7 @@ def unigrams(movie, vocab):
     norm = [float(i) / sum(unis) for i in unis] #normalize to sum to 1.0
     return norm
 
-def bigrams(movie, bigrams):
+def get_bigrams(movie, bigrams):
     stemmer = PorterStemmer()
     bis = [0]*len(bigrams)
     for line in movie.lines:

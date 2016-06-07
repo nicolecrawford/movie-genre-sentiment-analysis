@@ -54,6 +54,31 @@ def get_accuracy(y_pred,y_true):
             correct += 1
     return float(correct)/len(y_true)
 
+
+def test_on_test(movie_test, movie_map, bechdel_map,model,vocab, bigrams):
+    X = []
+    y_true = []
+    pos = 0
+    neg = 0
+    for m_id in movie_test:
+        rate = float(movie_map[m_id].rating)
+        if rate <= 5:
+            neg +=1
+            movie_features = feature_extractor.rating_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
+            X.append(movie_features)
+            y_true.append(0)
+        elif rate >= 7.5:
+            pos += 1
+            movie_features = feature_extractor.rating_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
+            X.append(movie_features)
+            y_true.append(1)
+    y_pred = model.predict(X)
+    print "pos",pos
+    print "neg",neg
+
+    print(classification_report(y_true, y_pred, target_names=target_names))
+    print "Accuracy: ", str(get_accuracy(y_pred,y_true))
+
 def test_on_dev(movie_dev, movie_map, bechdel_map,model,vocab, bigrams):
     X = []
     y_true = []
@@ -72,6 +97,11 @@ def test_on_dev(movie_dev, movie_map, bechdel_map,model,vocab, bigrams):
             X.append(movie_features)
             y_true.append(1)
     y_pred = model.predict(X)
+    for i in range(len(y_pred)):
+        if y_pred[i] != y_true[i]:
+            print movie_map[movie_dev[i]].title
+            print 'actual',y_true[i]
+            print 'predicted',y_pred[i]
     print "pos",pos
     print "neg",neg
 
@@ -91,10 +121,11 @@ def main():
     movie_map = pickle.load(open("pickles/movie_map.p", "rb"))
     movie_train = pickle.load(open("pickles/movie_train.p", "rb"))
     movie_dev = pickle.load(open("pickles/movie_dev.p", "rb"))
-    # movie_test = pickle.load(open("pickles/movie_test.p", "rb"))
+    movie_test = pickle.load(open("pickles/movie_test.p", "rb"))
     bechdel_map = parser.parse_bechdel()
     vocab = pickle.load(open("pickles/vocab.p", "rb"))
-    bigrams = pickle.load(open("pickles/bigrams.p", "rb"))
+    # bigrams = pickle.load(open("pickles/bigrams.p", "rb"))
+    bigrams = []
 
     # rating_distribution = collections.defaultdict(int)
     # for m_id in movie_train:
@@ -140,7 +171,8 @@ def main():
         test_on_dev(movie_dev, movie_map, bechdel_map, model, vocab, bigrams)
     else:
         test_on_train(X, y_true, model)
-    print "weights:", model.coef_
+    test_on_test(movie_test, movie_map, bechdel_map, model, vocab, bigrams)
+    # print "weights:", model.coef_
 
 
 def divide_corpus(movie_map):
