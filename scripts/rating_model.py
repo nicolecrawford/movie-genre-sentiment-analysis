@@ -120,6 +120,7 @@ def test_on_train(X, y_true, model):
 def main():
 
     print_configs()
+    print feature_extractor.get_feature_list()
 
     # movie_map = parser.get_parsed_data()
     movie_map = pickle.load(open("pickles/movie_map.p", "rb"))

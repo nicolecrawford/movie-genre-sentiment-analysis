@@ -22,10 +22,10 @@ genre_map_all = {'': 0, 'family': 1, 'adventure': 2, 'fantasy': 3, 'biography': 
              'animation': 7, 'music': 8, 'comedy': 9, 'war': 10, 'sci-fi': 11, 'horror': 12, 'western': 13, 'thriller': 14,
              'mystery': 15, 'film-noir': 16, 'drama': 17, 'action': 18, 'documentary': 19, 'musical': 20, 'history': 21}
 
-genre_list = ['Genre: Comedy', 'Genre: Action', 'Genre: Thriller', "Genre: sci-fi", "Genre: Documentary", "Genre: Drama"]
+genre_list = ['comedy', 'action', 'thriller', "sci-fi", "documentary", "drama"]
 
 def get_feature_list():
-    feature_list = ["num_characters_feat", 
+    feature_list = ["number_characters_feat", 
                 "ratio_male_characters_feat", 
                 "ratio_female_characters_feat", 
                 "avg_line_length_feat",
@@ -39,10 +39,10 @@ def get_feature_list():
                 "exclamations",
                 "questions",]
 
-    feature_list.extend(genre_list)
+    feature_list.extend(["Genre: " + i.lower() for i in genre_list])
 
     liwc_categories = ['TOTAL PRON', 'ANXIETY', 'LEISURE', 'EXCLUSION', '1ST SINGULAR', 'CERTAINTY', 'HUMANS', 'CONJUNCTIONS', 'SADNESS', 'INHIBITION', '1ST PLURAL', 'RELATIVITY', 'HOME', 'COGNITIVE PROCESSES', 'TENTATIVENESS', 'INCLUSION', 'QUANTIFIERS', 'SEXUAL', 'POSITIVE EMOTION', 'INSIGHT', 'DISCREPANCY', 'MOTION', 'PRESENT TENSE', 'BIOLOGICAL PROCESSES', 'NEGATIONS', 'ANGER', 'HEALTH', 'ACHIEVEMENT', 'COMMON VERBS', 'BODY', 'SEEING', '3RD SINGULAR', 'FUNCTION WORDS', 'FAMILY', 'SPACE', 'ASSENT', 'TIME', 'IMPERSONAL PRON', 'AUXILIARY VERBS', 'INGESTION', 'NUMBERS', 'MONEY', 'NON-FLUENCIES', 'SWEAR WORDS', 'FEELING', 'RELIGION', 'FILLERS', 'ARTICLES', 'TOTAL 2ND', 'FUTURE TENSE', 'AFFECTIVE PROCESSES', 'WORK', 'SOCIAL PROCESSES', 'PERCEPTUAL PROCESSES', 'HEARING', 'PREPOSITIONS', 'ADVERBS', '3RD PLURAL', 'PERSONAL PRON', 'DEATH', 'FRIENDS', 'CAUSATION', 'NEGATIVE EMOTION', 'PAST TENSE']
-    feature_list.extend(liwc_categories)
+    feature_list.extend(["LIWC: " + i.lower() for i in liwc_categories])
     return feature_list
 
 
