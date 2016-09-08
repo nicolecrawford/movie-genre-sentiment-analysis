@@ -131,8 +131,6 @@ def main():
     else:
         model = lr()
 
-    print X
-    print y_true
     model.fit(X, y_true)
 
     pickle.dump(model, open("pickles/model.p", "wb"))

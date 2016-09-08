@@ -120,7 +120,6 @@ def test_on_train(X, y_true, model):
 def main():
 
     print_configs()
-    print feature_extractor.get_feature_list()
 
     # movie_map = parser.get_parsed_data()
     movie_map = pickle.load(open("pickles/movie_map.p", "rb"))
@@ -162,13 +161,13 @@ def main():
             pos += 1
     print "pos", pos
     print "neg", neg
-    model = lr()
+
     if rumSVM:
         model = svm.SVC()
-        model.fit(X, y_true)
     else:
         model = lr()
-        model.fit(X, y_true)
+
+    model.fit(X, y_true)
 
     pickle.dump(model, open("pickles/model.p", "wb"))
 

@@ -99,7 +99,7 @@ def box_office_extract_all(movie, bechdel_map, vocab,bigrams):
     X.append(tot_num_lines_feat(movie))
     X.append(pass_bechdel(movie, bechdel_map))
     X.append(two_female_leads(movie))
-    X.append(main_character_gender(movie)) # TODO
+    X.extend(main_character_gender(movie))
     X.append(movie_vocab_size(movie))
     X.append(pronoun_ratio(movie))
     X.append(exclamations(movie))
