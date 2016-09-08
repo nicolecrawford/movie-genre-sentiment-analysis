@@ -22,7 +22,7 @@ genre_map_all = {'': 0, 'family': 1, 'adventure': 2, 'fantasy': 3, 'biography': 
              'animation': 7, 'music': 8, 'comedy': 9, 'war': 10, 'sci-fi': 11, 'horror': 12, 'western': 13, 'thriller': 14,
              'mystery': 15, 'film-noir': 16, 'drama': 17, 'action': 18, 'documentary': 19, 'musical': 20, 'history': 21}
 
-genre_list = ['comedy', 'action', 'thriller', "sci-fi", "documentary", "drama"]
+genre_list = ['Genre: Comedy', 'Genre: Action', 'Genre: Thriller', "Genre: sci-fi", "Genre: Documentary", "Genre: Drama"]
 
 def get_feature_list():
     feature_list = ["num_characters_feat", 
@@ -258,13 +258,16 @@ def main_character_gender(movie):
         if character.position != -1 and character.position < smallest_position:
             smallest_position = character.position
             if character.gender == "m":
-                # leading_gender = 1
-                response[0] = 1
+                leading_gender = 1
             elif character.gender == "f":
-                # leading_gender = -1
-                response[1] = 1
-            # else:
-                # leading_gender = 0
+                leading_gender = -1
+            else:
+                leading_gender = 0
+
+    if leading_gender == 1:
+        response[0] = 1
+    elif leading_gender == -1:
+        response[1] = 1
     return response
     # return leading_gender
 
