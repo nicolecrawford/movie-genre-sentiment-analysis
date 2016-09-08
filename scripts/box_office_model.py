@@ -12,7 +12,10 @@ import random
 import pickle
 from collections import Counter
 
-test_dev = False
+
+test_train = True
+test_dev = True
+test_test = False
 runSVM = False
 
 # 0 = fail ; 1 = success
@@ -54,16 +57,19 @@ def test_on_dev(movie_dev, movie_map, bechdel_map,model,vocab,box_office, bigram
     X = []
     y_true = []
     count = 1
+    hits = 0
+    flops = 0
     for m_id in movie_dev:
         if box_office[m_id] != 0:
             print "dev movie", movie_map[m_id].title
             count += 1
-
             if box_office[m_id] == 1:
+                hits += 1
                 y_true.append(target_names[1])
                 movie_features = feature_extractor.box_office_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
                 X.append(movie_features)
             elif box_office[m_id] == -1:
+                flops += 1
                 y_true.append(target_names[0])
                 movie_features = feature_extractor.box_office_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
                 X.append(movie_features)
@@ -105,21 +111,28 @@ def main():
     X = []
     y_true = []
     train_count = 0
+    hits = 0
+    flops = 0
     for m_id in movie_train:
         if box_office[m_id] != 0:
-            print "train movie", movie_map[m_id].title
+            print "train movie:", movie_map[m_id].title
+            train_count += 1
             if box_office[m_id] == 1:
-                train_count +=1
+                hits += 1
                 y_true.append(target_names[1])
                 movie_features = feature_extractor.box_office_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
                 X.append(movie_features)
             elif box_office[m_id] == -1:
-                train_count += 1
+                flops += 1
                 y_true.append(target_names[0])
                 movie_features = feature_extractor.box_office_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
                 X.append(movie_features)
+    
+
     print "train count", train_count
-    model = lr()
+    print "hits", hits
+    print "flops", flops
+
     if runSVM:
         model = svm.SVC()
         model.fit(X, y_true)
@@ -129,12 +142,35 @@ def main():
 
     pickle.dump(model, open("pickles/model.p", "wb"))
 
+
+    if test_train:
+        test_on_train(X, y_true, model,movie_map,movie_train)
     if test_dev:
         test_on_dev(movie_dev, movie_map, bechdel_map, model,vocab, box_office, bigrams)
-    else:
-        test_on_train(X, y_true, model,movie_map,movie_train)
-    test_on_test(movie_test, movie_map, bechdel_map, model,vocab, box_office, bigrams)
-    print "weights", model.coef_
+    if test_test:
+        test_on_test(movie_test, movie_map, bechdel_map, model,vocab, box_office, bigrams)
+
+    print_weights(model)
+
+
+def print_weights(model):
+
+    feature_list = feature_extractor.get_feature_list()
+    feature_weights = []
+    for i in range(len(feature_list)):
+        feature_weights.append((feature_list[i], model.coef_[0][i]))
+
+    feature_weights.sort(key=lambda tup: tup[1], reverse=True)
+
+    print "weights, high to low"
+    for w in feature_weights:
+        print w
+
+
+    feature_weights.sort(key=lambda tup: abs(tup[1]), reverse=True)
+    print "weights (absolute), high to low"
+    for w in feature_weights:
+        print w    
 
 def divide_corpus(movie_map):
 

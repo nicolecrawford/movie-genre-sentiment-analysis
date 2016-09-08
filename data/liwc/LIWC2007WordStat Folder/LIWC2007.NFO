@@ -1,0 +1,37 @@
+[PROTECTION]
+Stemming=1
+Exclusion List=1
+Include Level=0
+Overlap=1
+Category only=0
+Exclude word=1
+Process numeric=1
+Valid char=1
+Case sensitive=1
+Exclusion=1
+Inclusion=1
+[DESCRIPTION]
+Show=1
+TEXT=This is a WordStat version of the LIWC 2007^p^pReference: Pennebaker, J.W., Booth, R.J., & Francis, M.E. (2007). LIWC ^p2007 Linguistic Inquiry and Word Count. Austin Texas: liwc.com.^p
+[WordStat]
+Level=2
+Stemming=0
+Stemming type=English - Lemmatization
+Exclusion=0
+Exclusion List=C:\PROGRAM FILES\PROVALIS RESEARCH\DICT\DEFAULT.EXC
+Last Category=1
+Process Numeric=0
+Exclude Category Names=1
+Characters=
+Case sensitive=0
+Overlap=1
+[CATEGORIES]
+\LINGUISTIC PROCESSES\1ST PLURAL=
+\LINGUISTIC PROCESSES\1ST SINGULAR=
+\LINGUISTIC PROCESSES\3RD PLURAL=
+\LINGUISTIC PROCESSES\3RD SINGULAR=
+\LINGUISTIC PROCESSES\FUNCTION WORDS=
+\LINGUISTIC PROCESSES\IMPERSONAL PRON=
+\LINGUISTIC PROCESSES\PERSONAL PRON=
+\LINGUISTIC PROCESSES\TOTAL 2ND=
+\LINGUISTIC PROCESSES\TOTAL PRON=

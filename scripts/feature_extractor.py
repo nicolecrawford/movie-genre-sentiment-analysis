@@ -7,6 +7,7 @@ import nltk
 from nltk.stem.porter import *
 from nltk.corpus import opinion_lexicon
 import collections
+import pickle
 
 # 		- bigrams
 #       - tfidf
@@ -17,8 +18,32 @@ genre_map = {'': 5, 'family': 0, 'adventure': 1, 'fantasy': 3, 'biography': 4, '
              'animation': 0, 'music': 0, 'comedy': 0, 'war': 1, 'sci-fi': 3, 'horror': 2, 'western': 1, 'thriller': 2,
              'mystery': 2, 'film-noir': 5, 'drama': 5, 'action': 1, 'documentary': 4, 'musical': 0, 'history': 4}
 
-target_names = ['comedy', 'action', 'thriller', "sci-fi", "documentary", "drama"]
+genre_map_all = {'': 0, 'family': 1, 'adventure': 2, 'fantasy': 3, 'biography': 4, 'crime': 5, 'romance': 6,
+             'animation': 7, 'music': 8, 'comedy': 9, 'war': 10, 'sci-fi': 11, 'horror': 12, 'western': 13, 'thriller': 14,
+             'mystery': 15, 'film-noir': 16, 'drama': 17, 'action': 18, 'documentary': 19, 'musical': 20, 'history': 21}
 
+genre_list = ['comedy', 'action', 'thriller', "sci-fi", "documentary", "drama"]
+
+def get_feature_list():
+    feature_list = ["num_characters_feat", 
+                "ratio_male_characters_feat", 
+                "ratio_female_characters_feat", 
+                "avg_line_length_feat",
+                "tot_num_lines_feat",
+                "pass_bechdel",
+                "two_female_leads",
+                "main_character_male", 
+                "main_character_female", 
+                "movie_vocab_size",
+                "pronoun_ratio",
+                "exclamations",
+                "questions",]
+
+    feature_list.extend(genre_list)
+
+    liwc_categories = ['TOTAL PRON', 'ANXIETY', 'LEISURE', 'EXCLUSION', '1ST SINGULAR', 'CERTAINTY', 'HUMANS', 'CONJUNCTIONS', 'SADNESS', 'INHIBITION', '1ST PLURAL', 'RELATIVITY', 'HOME', 'COGNITIVE PROCESSES', 'TENTATIVENESS', 'INCLUSION', 'QUANTIFIERS', 'SEXUAL', 'POSITIVE EMOTION', 'INSIGHT', 'DISCREPANCY', 'MOTION', 'PRESENT TENSE', 'BIOLOGICAL PROCESSES', 'NEGATIONS', 'ANGER', 'HEALTH', 'ACHIEVEMENT', 'COMMON VERBS', 'BODY', 'SEEING', '3RD SINGULAR', 'FUNCTION WORDS', 'FAMILY', 'SPACE', 'ASSENT', 'TIME', 'IMPERSONAL PRON', 'AUXILIARY VERBS', 'INGESTION', 'NUMBERS', 'MONEY', 'NON-FLUENCIES', 'SWEAR WORDS', 'FEELING', 'RELIGION', 'FILLERS', 'ARTICLES', 'TOTAL 2ND', 'FUTURE TENSE', 'AFFECTIVE PROCESSES', 'WORK', 'SOCIAL PROCESSES', 'PERCEPTUAL PROCESSES', 'HEARING', 'PREPOSITIONS', 'ADVERBS', '3RD PLURAL', 'PERSONAL PRON', 'DEATH', 'FRIENDS', 'CAUSATION', 'NEGATIVE EMOTION', 'PAST TENSE']
+    feature_list.extend(liwc_categories)
+    return feature_list
 
 
 def genre_extract_all(movie, bechdel_map, vocab, bigrams):
@@ -50,15 +75,17 @@ def rating_extract_all(movie, bechdel_map, vocab, bigrams):
     X.append(tot_num_lines_feat(movie))
     X.append(pass_bechdel(movie, bechdel_map))
     X.append(two_female_leads(movie))
-    X.append(main_character_gender(movie))
+    X.extend(main_character_gender(movie))
     X.append(movie_vocab_size(movie))
-    # X.extend(unigrams(movie, vocab))
-    # X.extend(get_bigrams(movie,bigrams))
-    # X.append(sentiment(movie))
     X.append(pronoun_ratio(movie))
     X.append(exclamations(movie))
     X.append(questions(movie))
     X.extend(genre_features(movie))
+    X.extend(liwc_counts(movie))
+    # X.extend(unigrams(movie, vocab))
+    # X.extend(get_bigrams(movie,bigrams))
+    # X.append(sentiment(movie))
+
     return X
 
 
@@ -72,14 +99,17 @@ def box_office_extract_all(movie, bechdel_map, vocab,bigrams):
     X.append(tot_num_lines_feat(movie))
     X.append(pass_bechdel(movie, bechdel_map))
     X.append(two_female_leads(movie))
-    X.append(main_character_gender(movie))
+    X.append(main_character_gender(movie)) # TODO
     X.append(movie_vocab_size(movie))
-    # X.extend(unigrams(movie, vocab))
-    # X.append(sentiment(movie))
     X.append(pronoun_ratio(movie))
     X.append(exclamations(movie))
     X.append(questions(movie))
     X.extend(genre_features(movie))
+    X.extend(liwc_counts(movie))
+    # X.extend(unigrams(movie, vocab))
+    # X.extend(get_bigrams(movie,bigrams))
+    # X.append(sentiment(movie))
+
     return X
 
 
@@ -103,7 +133,16 @@ def sentiment(movie):
 
 
 def genre_features(movie):
-    to_return = [0]*len(target_names)
+
+    # all genres scheme
+    '''to_return = [0]*len(genre_map_all)
+    for genre in movie.genres:
+        if genre in genre_map_all:
+            to_return[genre_map_all[genre]] += 1
+    return to_return'''
+
+    # best genre scheme
+    to_return = [0]*len(genre_list)
     best_genre_map = collections.defaultdict(int)
     for genre in movie.genres:
         if genre in genre_map:
@@ -111,6 +150,38 @@ def genre_features(movie):
     best_genre, count = max(best_genre_map.iteritems(), key=lambda x: x[1])
     to_return[best_genre] = 1
     return to_return
+
+def liwc_counts(movie):
+    liwc = pickle.load(open("pickles/liwc_stemmed.p", "rb"))
+    liwc_words = pickle.load(open("pickles/liwc_stemmed_words.p", "rb"))
+    liwc_cat_to_index = pickle.load(open("pickles/liwc_cat_to_index.p", "rb"))
+
+    liwc_count = [0]*len(liwc)
+    stemmer = PorterStemmer()
+
+    # make a list of all movie words
+    movie_words = []
+    for line in movie.lines:
+        words = re.findall(r"[\w']+|[.,!?;]", line.content.lower())
+        for w in words:
+            w = w.lower()
+            word = stemmer.stem(w)
+            movie_words.append(w)
+
+
+    for word in movie_words:
+        # first check if word is present at all
+        if word in liwc_words:
+            for cat in liwc:
+                if word in liwc[cat]:
+                    liwc_count[liwc_cat_to_index[cat]] += 1
+
+
+
+    norm = [float(i) / len(movie_words) for i in liwc_count] #normalize to sum to 1.0
+    # print liwc_count
+    # print norm
+    return norm
 
 
 def questions(movie):
@@ -178,19 +249,24 @@ def get_bigrams(movie, bigrams):
     return norm
 
 
+# returns an array [male, female]
 def main_character_gender(movie):
-    leading_gender = 1
+    response = [0, 0]
+    # leading_gender = 1
     smallest_position = 1000
-    for char in movie.characters:
-        if char.position != -1 and char.position < smallest_position:
-            smallest_position = char.position
-            if char.gender == "m":
-                leading_gender = 1
-            elif char.gender == "f":
-                leading_gender = -1
-            else:
-                leading_gender = 0
-    return leading_gender
+    for character in movie.characters:
+        if character.position != -1 and character.position < smallest_position:
+            smallest_position = character.position
+            if character.gender == "m":
+                # leading_gender = 1
+                response[0] = 1
+            elif character.gender == "f":
+                # leading_gender = -1
+                response[1] = 1
+            # else:
+                # leading_gender = 0
+    return response
+    # return leading_gender
 
 
 def two_male_leads(movie):
@@ -257,3 +333,5 @@ def movie_vocab_size(movie):
             word = stemmer.stem(w)
             vocab.add(word)
     return len(vocab)
+
+

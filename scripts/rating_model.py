@@ -37,15 +37,20 @@ genre_map = {'': 5, 'family': 0, 'adventure': 1, 'fantasy': 3, 'biography': 4, '
              'animation': 0, 'music': 0, 'comedy': 0, 'war': 1, 'sci-fi': 3, 'horror': 2, 'western': 1, 'thriller': 2,
              'mystery': 2, 'film-noir': 5, 'drama': 5, 'action': 1, 'documentary': 4, 'musical': 0, 'history': 4}
 
-target_names = ['comedy', 'action', 'thriller', "sci-fi", "documentary", "drama"]
+genre_names = ['comedy', 'action', 'thriller', "sci-fi", "documentary", "drama"]
 
 # bad=0;good=1
 target_names = ['bad', 'good']
 
-#FLAGS
-test_dev = True
-rumSVM = False
 
+
+#FLAGS
+test_train = True
+test_dev = True
+test_test = False
+rumSVM = False
+BAD_UPPER_BOUND = 5.5
+GOOD_LOWER_BOUND = 7.5
 
 def get_accuracy(y_pred,y_true):
     correct = 0
@@ -56,18 +61,19 @@ def get_accuracy(y_pred,y_true):
 
 
 def test_on_test(movie_test, movie_map, bechdel_map,model,vocab, bigrams):
+    print "-------test_on_test-------"
     X = []
     y_true = []
     pos = 0
     neg = 0
     for m_id in movie_test:
         rate = float(movie_map[m_id].rating)
-        if rate <= 5:
+        if rate <= BAD_UPPER_BOUND:
             neg +=1
             movie_features = feature_extractor.rating_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
             X.append(movie_features)
             y_true.append(0)
-        elif rate >= 7.5:
+        elif rate >= GOOD_LOWER_BOUND:
             pos += 1
             movie_features = feature_extractor.rating_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
             X.append(movie_features)
@@ -80,18 +86,19 @@ def test_on_test(movie_test, movie_map, bechdel_map,model,vocab, bigrams):
     print "Accuracy: ", str(get_accuracy(y_pred,y_true))
 
 def test_on_dev(movie_dev, movie_map, bechdel_map,model,vocab, bigrams):
+    print "-------test_on_dev-------"
     X = []
     y_true = []
     pos = 0
     neg = 0
     for m_id in movie_dev:
         rate = float(movie_map[m_id].rating)
-        if rate <= 5:
+        if rate <= BAD_UPPER_BOUND:
             neg +=1
             movie_features = feature_extractor.rating_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
             X.append(movie_features)
             y_true.append(0)
-        elif rate >= 7.5:
+        elif rate >= GOOD_LOWER_BOUND:
             pos += 1
             movie_features = feature_extractor.rating_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
             X.append(movie_features)
@@ -110,6 +117,7 @@ def test_on_dev(movie_dev, movie_map, bechdel_map,model,vocab, bigrams):
 
 
 def test_on_train(X, y_true, model):
+    print "-------test_on_train-------"
     y_pred = model.predict(X)
 
     print(classification_report(y_true, y_pred, target_names=target_names))
@@ -140,21 +148,21 @@ def main():
     X = []
     y_true = []
     pos = 0
-    neg =0
+    neg = 0
     for m_id in movie_train:
         # movie_features = feature_extractor.rating_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
         # X.append(movie_features)
         rate = float(movie_map[m_id].rating)
-        if rate <= 5:
+        if rate <= BAD_UPPER_BOUND:
             movie_features = feature_extractor.rating_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
             X.append(movie_features)
             y_true.append(0)
-            neg+=1
-        elif rate >= 7.5:
+            neg += 1
+        elif rate >= GOOD_LOWER_BOUND:
             movie_features = feature_extractor.rating_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
             X.append(movie_features)
             y_true.append(1)
-            pos+=1
+            pos += 1
     print "pos", pos
     print "neg", neg
     model = lr()
@@ -167,12 +175,36 @@ def main():
 
     pickle.dump(model, open("pickles/model.p", "wb"))
 
-    if test_dev:
-        test_on_dev(movie_dev, movie_map, bechdel_map, model, vocab, bigrams)
-    else:
+
+    if test_train:
         test_on_train(X, y_true, model)
-    test_on_test(movie_test, movie_map, bechdel_map, model, vocab, bigrams)
-    # print "weights:", model.coef_
+    if test_dev:
+        test_on_dev(movie_dev, movie_map, bechdel_map, model, vocab, bigrams)        
+    if test_test:
+        test_on_test(movie_test, movie_map, bechdel_map, model, vocab, bigrams)
+
+
+    print_weights(model)
+
+
+def print_weights(model):
+
+    feature_list = feature_extractor.get_feature_list()
+    feature_weights = []
+    for i in range(len(feature_list)):
+        feature_weights.append((feature_list[i], model.coef_[0][i]))
+
+    feature_weights.sort(key=lambda tup: tup[1], reverse=True)
+
+    print "weights, high to low"
+    for w in feature_weights:
+        print w[0] + " & " + round(w[1], 4)
+
+
+    feature_weights.sort(key=lambda tup: abs(tup[1]), reverse=True)
+    print "weights (absolute), high to low"
+    for w in feature_weights:
+        print w    
 
 
 def divide_corpus(movie_map):
