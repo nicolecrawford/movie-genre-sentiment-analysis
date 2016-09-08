@@ -1,5 +1,4 @@
-#for running all the models
-
+#for running all the box_office models 
 
 from sklearn import svm
 from sklearn.linear_model import LogisticRegression as lr
@@ -8,6 +7,7 @@ from sklearn.metrics import classification_report
 import classes
 import feature_extractor
 import parser
+import utils
 import random
 import pickle
 from collections import Counter
@@ -20,13 +20,6 @@ runSVM = False
 
 # 0 = fail ; 1 = success
 target_names = ["fail", "success"]
-
-def get_accuracy(y_pred,y_true):
-    correct = 0
-    for i in range(len(y_pred)):
-        if y_pred[i] == y_true[i]:
-            correct += 1
-    return float(correct)/len(y_true)
 
 
 def test_on_test(movie_test, movie_map, bechdel_map,model,vocab,box_office, bigrams):
@@ -50,7 +43,7 @@ def test_on_test(movie_test, movie_map, bechdel_map,model,vocab,box_office, bigr
     print "dev count", count
     y_pred = model.predict(X)
     print(classification_report(y_true, y_pred, target_names=target_names))
-    print "Accuracy: ", str(get_accuracy(y_pred, y_true))
+    print "Accuracy: ", str(utils.get_accuracy(y_pred, y_true))
 
 
 def test_on_dev(movie_dev, movie_map, bechdel_map,model,vocab,box_office, bigrams):
@@ -81,7 +74,7 @@ def test_on_dev(movie_dev, movie_map, bechdel_map,model,vocab,box_office, bigram
             print 'actual',y_true[i]
             print 'predicted',y_pred[i]
     print(classification_report(y_true, y_pred, target_names=target_names))
-    print "Accuracy: ", str(get_accuracy(y_pred, y_true))
+    print "Accuracy: ", str(utils.get_accuracy(y_pred, y_true))
 
 
 def test_on_train(X, y_true, model,movie_map,movie_train):
@@ -92,7 +85,7 @@ def test_on_train(X, y_true, model,movie_map,movie_train):
             print 'actual',y_true[i]
             print 'predicted',y_pred[i]
     print(classification_report(y_true, y_pred, target_names=target_names))
-    print "Accuracy: ", str(get_accuracy(y_pred, y_true))
+    print "Accuracy: ", str(utils.get_accuracy(y_pred, y_true))
 
 
 def main():
@@ -150,42 +143,8 @@ def main():
     if test_test:
         test_on_test(movie_test, movie_map, bechdel_map, model,vocab, box_office, bigrams)
 
-    print_weights(model)
+    utils.print_weights(model, feature_extractor.get_feature_list())
 
-
-def print_weights(model):
-
-    feature_list = feature_extractor.get_feature_list()
-    feature_weights = []
-    for i in range(len(feature_list)):
-        feature_weights.append((feature_list[i], model.coef_[0][i]))
-
-    feature_weights.sort(key=lambda tup: tup[1], reverse=True)
-
-    print "weights, high to low"
-    for w in feature_weights:
-        print w
-
-
-    feature_weights.sort(key=lambda tup: abs(tup[1]), reverse=True)
-    print "weights (absolute), high to low"
-    for w in feature_weights:
-        print w    
-
-def divide_corpus(movie_map):
-
-    del movie_map["m616"]
-
-    movie_list = list(movie_map.keys())
-    random.shuffle(movie_list)
-
-    movie_train = movie_list[0:395]
-    movie_test = movie_list[395:519]
-    movie_dev = movie_list[519:]
-
-    pickle.dump(movie_train, open("pickles/movie_train.p", "wb"))
-    pickle.dump(movie_dev, open("pickles/movie_dev.p", "wb"))
-    pickle.dump(movie_test, open("pickles/movie_test.p", "wb"))
 
 
 if __name__ == "__main__":
