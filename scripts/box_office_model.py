@@ -128,10 +128,12 @@ def main():
 
     if runSVM:
         model = svm.SVC()
-        model.fit(X, y_true)
     else:
         model = lr()
-        model.fit(X, y_true)
+
+    print X
+    print y_true
+    model.fit(X, y_true)
 
     pickle.dump(model, open("pickles/model.p", "wb"))
 
