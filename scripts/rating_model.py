@@ -49,7 +49,7 @@ test_train = True
 test_dev = True
 test_test = False
 rumSVM = False
-BAD_UPPER_BOUND = 6.0
+BAD_UPPER_BOUND = 5.5
 GOOD_LOWER_BOUND = 7.0
 
 def get_accuracy(y_pred,y_true):
