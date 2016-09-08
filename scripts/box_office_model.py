@@ -23,30 +23,42 @@ target_names = ["fail", "success"]
 
 
 def test_on_test(movie_test, movie_map, bechdel_map,model,vocab,box_office, bigrams):
+    print "-------test_on_TEST-------"
     X = []
     y_true = []
     count = 1
+    flops = 0
+    hits = 0
     for m_id in movie_test:
         if m_id in box_office:
             if box_office[m_id] != 0:
-                print "dev movie", movie_map[m_id].title
+                # print "test movie", movie_map[m_id].title
                 count += 1
 
                 if box_office[m_id] == 1:
+                    hits += 1
                     y_true.append(target_names[1])
                     movie_features = feature_extractor.box_office_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
                     X.append(movie_features)
+                    
                 elif box_office[m_id] == -1:
+                    flops += 1
                     y_true.append(target_names[0])
                     movie_features = feature_extractor.box_office_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
                     X.append(movie_features)
-    print "dev count", count
+
+    
+    print "test count", count
+    print "test count: flops", flops
+    print "test count: hits", hits
+
     y_pred = model.predict(X)
     print(classification_report(y_true, y_pred, target_names=target_names))
     print "Accuracy: ", str(utils.get_accuracy(y_pred, y_true))
 
 
 def test_on_dev(movie_dev, movie_map, bechdel_map,model,vocab,box_office, bigrams):
+    print "-------test_on_dev-------"
     X = []
     y_true = []
     count = 1
@@ -54,7 +66,7 @@ def test_on_dev(movie_dev, movie_map, bechdel_map,model,vocab,box_office, bigram
     flops = 0
     for m_id in movie_dev:
         if box_office[m_id] != 0:
-            print "dev movie", movie_map[m_id].title
+            # print "dev movie", movie_map[m_id].title
             count += 1
             if box_office[m_id] == 1:
                 hits += 1
@@ -66,7 +78,11 @@ def test_on_dev(movie_dev, movie_map, bechdel_map,model,vocab,box_office, bigram
                 y_true.append(target_names[0])
                 movie_features = feature_extractor.box_office_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
                 X.append(movie_features)
+
     print "dev count", count
+    print "dev count: flops", flops
+    print "dev count: hits", hits
+
     y_pred = model.predict(X)
     for i in range(len(y_pred)):
         if y_pred[i] != y_true[i]:
@@ -78,6 +94,7 @@ def test_on_dev(movie_dev, movie_map, bechdel_map,model,vocab,box_office, bigram
 
 
 def test_on_train(X, y_true, model,movie_map,movie_train):
+    print "-------test_on_train-------"
     y_pred = model.predict(X)
     for i in range(len(y_pred)):
         if y_pred[i] != y_true[i]:
@@ -108,7 +125,7 @@ def main():
     flops = 0
     for m_id in movie_train:
         if box_office[m_id] != 0:
-            print "train movie:", movie_map[m_id].title
+            # print "train movie:", movie_map[m_id].title
             train_count += 1
             if box_office[m_id] == 1:
                 hits += 1
@@ -121,7 +138,6 @@ def main():
                 movie_features = feature_extractor.box_office_extract_all(movie_map[m_id], bechdel_map, vocab, bigrams)
                 X.append(movie_features)
     
-
     print "train count", train_count
     print "hits", hits
     print "flops", flops

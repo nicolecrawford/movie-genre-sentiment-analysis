@@ -55,7 +55,7 @@ GOOD_LOWER_BOUND = 7.0
 
 
 def test_on_test(movie_test, movie_map, bechdel_map,model,vocab, bigrams):
-    print "-------test_on_test-------"
+    print "-------test_on_TEST-------"
     X = []
     y_true = []
     pos = 0
