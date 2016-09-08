@@ -49,8 +49,8 @@ test_train = True
 test_dev = True
 test_test = False
 rumSVM = False
-BAD_UPPER_BOUND = 5.5
-GOOD_LOWER_BOUND = 7.5
+BAD_UPPER_BOUND = 6.0
+GOOD_LOWER_BOUND = 7.0
 
 def get_accuracy(y_pred,y_true):
     correct = 0
@@ -125,6 +125,8 @@ def test_on_train(X, y_true, model):
 
 def main():
 
+    print_configs()
+
     # movie_map = parser.get_parsed_data()
     movie_map = pickle.load(open("pickles/movie_map.p", "rb"))
     movie_train = pickle.load(open("pickles/movie_train.p", "rb"))
@@ -187,6 +189,16 @@ def main():
     print_weights(model)
 
 
+def print_configs():
+
+    print "test_train", test_train
+    print "test_dev", test_dev
+    print "test_test", test_test
+    print "rumSVM", rumSVM
+    print "BAD_UPPER_BOUND", BAD_UPPER_BOUND
+    print "GOOD_LOWER_BOUND", GOOD_LOWER_BOUND
+
+
 def print_weights(model):
 
     feature_list = feature_extractor.get_feature_list()
@@ -198,7 +210,7 @@ def print_weights(model):
 
     print "weights, high to low"
     for w in feature_weights:
-        print w[0] + " & " + round(w[1], 4)
+        print w[0] + " & " + "{:.4f}".format(w[1])
 
 
     feature_weights.sort(key=lambda tup: abs(tup[1]), reverse=True)
