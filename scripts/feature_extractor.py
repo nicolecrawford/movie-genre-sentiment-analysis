@@ -252,7 +252,7 @@ def get_bigrams(movie, bigrams):
 # returns an array [male, female]
 def main_character_gender(movie):
     
-    # leading_gender = 1
+    leading_gender = 1
     smallest_position = 1000
     for character in movie.characters:
         if character.position != -1 and character.position < smallest_position:
