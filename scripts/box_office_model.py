@@ -104,8 +104,15 @@ def test_on_train(X, y_true, model,movie_map,movie_train):
     print(classification_report(y_true, y_pred, target_names=target_names))
     print "Accuracy: ", str(utils.get_accuracy(y_pred, y_true))
 
+def print_configs():
+    print "test_train", test_train
+    print "test_dev", test_dev
+    print "test_test", test_test
+    print "runSVM", runSVM
 
 def main():
+
+    print_configs()
 
     movie_map = parser.get_parsed_data()
 
