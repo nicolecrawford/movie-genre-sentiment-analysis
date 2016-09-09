@@ -188,7 +188,7 @@ def print_configs():
     print "test_train", test_train
     print "test_dev", test_dev
     print "test_test", test_test
-    print "rumSVM", rumSVM
+    print "runSVM", runSVM
     print "BAD_UPPER_BOUND", BAD_UPPER_BOUND
     print "GOOD_LOWER_BOUND", GOOD_LOWER_BOUND
 
