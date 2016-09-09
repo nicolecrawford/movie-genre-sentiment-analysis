@@ -113,7 +113,7 @@ def print_configs():
 def main():
 
     print_configs()
-    print feature_extractor.get_feature_list()
+    print feature_extractor.get_feature_list(vocab)
     # movie_map = parser.get_parsed_data()
 
     movie_train = pickle.load(open("pickles/movie_train.p", "rb"))
@@ -167,7 +167,7 @@ def main():
     if test_test:
         test_on_test(movie_test, movie_map, bechdel_map, model,vocab, box_office, bigrams)
 
-    utils.print_weights(model, feature_extractor.get_feature_list())
+    utils.print_weights(model, feature_extractor.get_feature_list(vocab))
 
 
 

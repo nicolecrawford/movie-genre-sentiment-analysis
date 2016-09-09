@@ -24,7 +24,7 @@ genre_map_all = {'': 0, 'family': 1, 'adventure': 2, 'fantasy': 3, 'biography': 
 
 genre_list = ['comedy', 'action', 'thriller', "sci-fi", "documentary", "drama"]
 
-def get_feature_list():
+def get_feature_list(vocab = None):
     feature_list = ["number_characters_feat", 
                 "ratio_male_characters_feat", 
                 "ratio_female_characters_feat", 
@@ -44,10 +44,12 @@ def get_feature_list():
     liwc_categories = ['TOTAL PRON', 'ANXIETY', 'LEISURE', 'EXCLUSION', '1ST SINGULAR', 'CERTAINTY', 'HUMANS', 'CONJUNCTIONS', 'SADNESS', 'INHIBITION', '1ST PLURAL', 'RELATIVITY', 'HOME', 'COGNITIVE PROCESSES', 'TENTATIVENESS', 'INCLUSION', 'QUANTIFIERS', 'SEXUAL', 'POSITIVE EMOTION', 'INSIGHT', 'DISCREPANCY', 'MOTION', 'PRESENT TENSE', 'BIOLOGICAL PROCESSES', 'NEGATIONS', 'ANGER', 'HEALTH', 'ACHIEVEMENT', 'COMMON VERBS', 'BODY', 'SEEING', '3RD SINGULAR', 'FUNCTION WORDS', 'FAMILY', 'SPACE', 'ASSENT', 'TIME', 'IMPERSONAL PRON', 'AUXILIARY VERBS', 'INGESTION', 'NUMBERS', 'MONEY', 'NON-FLUENCIES', 'SWEAR WORDS', 'FEELING', 'RELIGION', 'FILLERS', 'ARTICLES', 'TOTAL 2ND', 'FUTURE TENSE', 'AFFECTIVE PROCESSES', 'WORK', 'SOCIAL PROCESSES', 'PERCEPTUAL PROCESSES', 'HEARING', 'PREPOSITIONS', 'ADVERBS', '3RD PLURAL', 'PERSONAL PRON', 'DEATH', 'FRIENDS', 'CAUSATION', 'NEGATIVE EMOTION', 'PAST TENSE']
     feature_list.extend(["LIWC: " + i.lower() for i in liwc_categories])
 
-    all_words = [""]*len(vocab)
-    for w in vocab:
-        all_words[vocab[w]] = w
-    feature_list.extend(all_words)
+    # unigrams
+    if (vocab != None):
+        all_words = [""]*len(vocab)
+        for w in vocab:
+            all_words[vocab[w]] = w
+        feature_list.extend(all_words)
 
     return feature_list
 
