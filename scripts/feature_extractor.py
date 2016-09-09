@@ -32,8 +32,9 @@ def get_feature_list(vocab = None):
                 "tot_num_lines_feat",
                 "pass_bechdel",
                 "two_female_leads",
-                "main_character_male", 
-                "main_character_female", 
+                "main_character_gender", 
+                # "main_character_male", 
+                # "main_character_female", 
                 "movie_vocab_size",
                 "pronoun_ratio",
                 "exclamations",
@@ -272,13 +273,13 @@ def main_character_gender(movie):
             else:
                 leading_gender = 0
 
-    response = [0, 0]
-    if leading_gender == 1:
-        response[0] = 1
-    elif leading_gender == -1:
-        response[1] = 1
-    return response
-    # return leading_gender
+    # response = [0, 0]
+    # if leading_gender == 1:
+    #     response[0] = 1
+    # elif leading_gender == -1:
+    #     response[1] = 1
+    # return response
+    return [leading_gender]
 
 
 def two_male_leads(movie):
