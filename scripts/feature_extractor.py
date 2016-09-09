@@ -89,7 +89,7 @@ def rating_extract_all(movie, bechdel_map, vocab, bigrams):
     return X
 
 
-def box_office_extract_all(movie, bechdel_map, vocab,bigrams):
+def box_office_extract_all(movie, bechdel_map, vocab, bigrams):
     X = list()
     # X.append(0) #baseline
     X.append(num_characters_feat(movie))
@@ -106,7 +106,7 @@ def box_office_extract_all(movie, bechdel_map, vocab,bigrams):
     X.append(questions(movie))
     X.extend(genre_features(movie))
     X.extend(liwc_counts(movie))
-    # X.extend(unigrams(movie, vocab))
+    X.extend(unigrams(movie, vocab))
     # X.extend(get_bigrams(movie,bigrams))
     # X.append(sentiment(movie))
 
