@@ -12,7 +12,7 @@ def get_parsed_data():
     return movie_map
 
 
-# only run once
+# vocab: map word -> index
 def get_unigrams():
     stemmer = PorterStemmer()
     vocab_counter = {}
