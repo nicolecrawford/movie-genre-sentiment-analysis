@@ -86,9 +86,9 @@ def test_on_dev(movie_dev, movie_map, bechdel_map,model,vocab,box_office, bigram
     y_pred = model.predict(X)
     for i in range(len(y_pred)):
         if y_pred[i] != y_true[i]:
-            print movie_map[movie_dev[i]].title
-            print 'actual',y_true[i]
-            print 'predicted',y_pred[i]
+            # print movie_map[movie_dev[i]].title
+            # print 'actual',y_true[i]
+            # print 'predicted',y_pred[i]
     print(classification_report(y_true, y_pred, target_names=target_names))
     print "Accuracy: ", str(utils.get_accuracy(y_pred, y_true))
 
@@ -98,9 +98,9 @@ def test_on_train(X, y_true, model,movie_map,movie_train):
     y_pred = model.predict(X)
     for i in range(len(y_pred)):
         if y_pred[i] != y_true[i]:
-            print movie_map[movie_train[i]].title
-            print 'actual',y_true[i]
-            print 'predicted',y_pred[i]
+            # print movie_map[movie_train[i]].title
+            # print 'actual',y_true[i]
+            # print 'predicted',y_pred[i]
     print(classification_report(y_true, y_pred, target_names=target_names))
     print "Accuracy: ", str(utils.get_accuracy(y_pred, y_true))
 
@@ -118,7 +118,7 @@ def main():
     movie_map = pickle.load(open("pickles/movie_map.p", "rb"))
     movie_train = pickle.load(open("pickles/movie_train.p", "rb"))
     movie_dev = pickle.load(open("pickles/movie_dev.p", "rb"))
-    box_office = pickle.load(open("pickles/movie_success.p", "rb"))
+    box_office = pickle.load(open("pickles/movie_success_point_five.p", "rb"))
     movie_test = pickle.load(open("pickles/movie_test.p", "rb"))
     bechdel_map = pickle.load(open("pickles/bechdels.p", "rb"))
     vocab = pickle.load(open("pickles/vocab.p", "rb"))

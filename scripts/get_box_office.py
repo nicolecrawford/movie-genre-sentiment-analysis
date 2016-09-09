@@ -101,7 +101,7 @@ for key in movie_map:
 			no_data += 1
 			movie_success[key] = 0
 			print "box office n/a"
-		elif (budget * 2) < box_office: # success
+		elif (budget * 1.5) < box_office: # success
 			hits += 1
 			movie_success[key] = 1
 			print "box office success"
@@ -120,7 +120,7 @@ print "flops", flops
 print "no_data", no_data
 print "mid_range", mid_range
 
-pickle.dump(movie_success, open("pickles/movie_success.p", "wb"))
+pickle.dump(movie_success, open("pickles/movie_success_point_five.p", "wb"))
 
 
 print counter, total
