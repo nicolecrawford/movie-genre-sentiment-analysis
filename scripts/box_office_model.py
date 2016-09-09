@@ -135,6 +135,7 @@ def main():
     flops = 0
     for m_id in movie_train:
         if box_office[m_id] != 0:
+            print "m_id", m_id
             # print "train movie:", movie_map[m_id].title
             train_count += 1
             if box_office[m_id] == 1:

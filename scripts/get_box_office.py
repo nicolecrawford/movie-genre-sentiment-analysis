@@ -17,15 +17,14 @@ print "finished loading movie_map"
 url = 'http://www.boxofficemojo.com/search/q.php'
 movie_success = {}
 total = len(movie_map.keys())
-counter = 0
 hits = 0
 flops = 0
 no_data = 0
 mid_range = 0
 for key in movie_map:
-
+	movie_success[key] = 0
 	box_office = 0
-	budget = 0
+	budget = 0	
 	movie_page = ""
 	title = movie_map[key].title
 	query_args = {'q': title}
@@ -95,7 +94,6 @@ for key in movie_map:
 		print "box_office", box_office
 		print movie_page
 		print "budget:", budget
-		if box_office is not None: counter += 1
 
 		if budget == 0 or box_office == 0: # no info
 			no_data += 1
@@ -123,6 +121,6 @@ print "mid_range", mid_range
 pickle.dump(movie_success, open("pickles/movie_success_point_five.p", "wb"))
 
 
-print counter, total
+print total
 # 456/617 movies have results for this; that's 74%
 # get budget data? it's a lot more complicated 
