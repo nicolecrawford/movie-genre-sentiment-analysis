@@ -84,8 +84,8 @@ def test_on_dev(movie_dev, movie_map, bechdel_map,model,vocab,box_office, bigram
     print "dev count: hits", hits
 
     y_pred = model.predict(X)
-    for i in range(len(y_pred)):
-        if y_pred[i] != y_true[i]:
+    # for i in range(len(y_pred)):
+        # if y_pred[i] != y_true[i]:
             # print movie_map[movie_dev[i]].title
             # print 'actual',y_true[i]
             # print 'predicted',y_pred[i]
@@ -96,8 +96,8 @@ def test_on_dev(movie_dev, movie_map, bechdel_map,model,vocab,box_office, bigram
 def test_on_train(X, y_true, model,movie_map,movie_train):
     print "-------test_on_train-------"
     y_pred = model.predict(X)
-    for i in range(len(y_pred)):
-        if y_pred[i] != y_true[i]:
+    # for i in range(len(y_pred)):
+        # if y_pred[i] != y_true[i]:
             # print movie_map[movie_train[i]].title
             # print 'actual',y_true[i]
             # print 'predicted',y_pred[i]
