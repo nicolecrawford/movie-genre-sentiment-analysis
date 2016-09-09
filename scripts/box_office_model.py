@@ -113,7 +113,6 @@ def print_configs():
 def main():
 
     print_configs()
-    print feature_extractor.get_feature_list(vocab)
     # movie_map = parser.get_parsed_data()
 
     movie_train = pickle.load(open("pickles/movie_train.p", "rb"))
@@ -124,6 +123,8 @@ def main():
     vocab = pickle.load(open("pickles/vocab.p", "rb"))
     # bigrams = pickle.load(open("pickles/bigrams.p", "rb"))
     bigrams = []
+
+    print feature_extractor.get_feature_list(vocab)
 
     # train and fit model
     X = []
