@@ -113,8 +113,9 @@ def print_configs():
 def main():
 
     print_configs()
+    
     # movie_map = parser.get_parsed_data()
-
+    movie_map = pickle.load(open("pickles/movie_map.p", "rb"))
     movie_train = pickle.load(open("pickles/movie_train.p", "rb"))
     movie_dev = pickle.load(open("pickles/movie_dev.p", "rb"))
     box_office = pickle.load(open("pickles/movie_success.p", "rb"))
