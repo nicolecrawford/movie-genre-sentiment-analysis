@@ -18,6 +18,10 @@ url = 'http://www.boxofficemojo.com/search/q.php'
 movie_success = {}
 total = len(movie_map.keys())
 counter = 0
+hits = 0
+flops = 0
+no_data = 0
+mid_range = 0
 for key in movie_map:
 
 	box_office = 0
@@ -93,16 +97,28 @@ for key in movie_map:
 		print "budget:", budget
 		if box_office is not None: counter += 1
 
-
 		if budget == 0 or box_office == 0: # no info
+			no_data += 1
 			movie_success[key] = 0
 			print "box office n/a"
 		elif (budget * 2) < box_office: # success
+			hits += 1
 			movie_success[key] = 1
 			print "box office success"
-		else: # failure
+		elif budget > box_office: # failure
+			flops += 1
 			movie_success[key] = -1
 			print "box office flop"
+		else: # nothing
+			mid_range += 1
+			movie_success[key] = 0
+			print "box office dead gap"
+
+
+print "hits", hits
+print "flops", flops
+print "no_data", no_data
+print "mid_range", mid_range
 
 pickle.dump(movie_success, open("pickles/movie_success.p", "wb"))
 

@@ -17,7 +17,7 @@ def get_unigrams():
     stemmer = PorterStemmer()
     vocab_counter = {}
     vocab = {}
-    index = 0
+    
     for line in open("cornell-movie-dialogs-corpus/movie_lines.txt"):
         cats = line.split(" +++$+++ ")
         content = re.findall(r"[\w']+|[.,!?;]", cats[4].lower())
@@ -27,8 +27,10 @@ def get_unigrams():
                 vocab_counter[word] += 1
             else:
                 vocab_counter[word] = 1
+
+    index = 0
     for w in vocab_counter:
-        if vocab_counter[w] > 0:
+        if vocab_counter[w] > 0: # why perform this check? all vocab_counter elems have count > 0
             vocab[w] = index
             index +=1
     # vocab['UNK'] = index

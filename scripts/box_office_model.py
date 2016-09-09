@@ -169,7 +169,8 @@ def main():
     if test_test:
         test_on_test(movie_test, movie_map, bechdel_map, model,vocab, box_office, bigrams)
 
-    utils.print_weights(model, feature_extractor.get_feature_list(vocab))
+    if not runSVM:
+        utils.print_weights(model, feature_extractor.get_feature_list(vocab))
 
 
 

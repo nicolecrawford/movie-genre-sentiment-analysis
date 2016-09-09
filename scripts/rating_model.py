@@ -48,8 +48,8 @@ target_names = ['bad', 'good']
 #FLAGS
 test_train = True
 test_dev = True
-test_test = False
-rumSVM = False
+test_test = True
+runSVM = True
 BAD_UPPER_BOUND = 5.5
 GOOD_LOWER_BOUND = 7.0
 
@@ -162,7 +162,7 @@ def main():
     print "pos", pos
     print "neg", neg
 
-    if rumSVM:
+    if runSVM:
         model = svm.SVC()
     else:
         model = lr()
@@ -179,7 +179,8 @@ def main():
     if test_test:
         test_on_test(movie_test, movie_map, bechdel_map, model, vocab, bigrams)
 
-    utils.print_weights(model, feature_extractor.get_feature_list())
+    if not runSVM:
+        utils.print_weights(model, feature_extractor.get_feature_list())
 
 
 def print_configs():
