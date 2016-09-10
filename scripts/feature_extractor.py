@@ -46,11 +46,11 @@ def get_feature_list(vocab = None):
     feature_list.extend(["LIWC: " + i.lower() for i in liwc_categories])
 
     # unigrams
-    if (vocab != None):
-        all_words = [""]*len(vocab)
-        for w in vocab:
-            all_words[vocab[w]] = w
-        feature_list.extend(all_words)
+    # if (vocab != None):
+    #     all_words = [""]*len(vocab)
+    #     for w in vocab:
+    #         all_words[vocab[w]] = w
+    #     feature_list.extend(all_words)
 
     return feature_list
 
@@ -115,7 +115,7 @@ def box_office_extract_all(movie, bechdel_map, vocab, bigrams):
     X.append(questions(movie))
     X.extend(genre_features(movie))
     X.extend(liwc_counts(movie))
-    X.extend(unigrams(movie, vocab))
+    # X.extend(unigrams(movie, vocab))
     # X.extend(get_bigrams(movie,bigrams))
     # X.append(sentiment(movie))
 
